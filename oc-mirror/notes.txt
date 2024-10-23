@@ -26,3 +26,13 @@ cp -v $HOME/pull-secret $HOME/.docker/config.json
 # copy of running oc-mirror command
 oc-mirror --config imageset-config.yaml file:///mnt/low-side-data
 
+
+
+--------  extra commands  --------
+# Extra oc-mirror examples
+oc-mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.16
+oc-mirror list operators --catalog=registry.redhat.io/redhat/certified-operator-index:v4.16
+oc-mirror list operators --catalog=registry.redhat.io/redhat/community-operator-index:v4.16
+
+oc-mirror list releases --channel=stable-4.16
+

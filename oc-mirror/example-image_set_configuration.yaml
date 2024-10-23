@@ -13,7 +13,7 @@ mirror:
     - name: stable-4.16 # Want to grab specific releases
       type: ocp
       minVersion: 4.16.1
-      maxVersion: 4.16.20
+      maxVersion: 4.16.16
       shortestPath: true
     channels:
     - name: stable-4.16 # grab latest
