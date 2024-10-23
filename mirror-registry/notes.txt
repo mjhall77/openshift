@@ -1,0 +1,16 @@
+# set up temporary container registry
+# Additional Doc on setting it up:  https://www.redhat.com/en/blog/introducing-mirror-registry-for-red-hat-openshift
+curl -L -o mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
+tar -xzvf mirror-registry.tar.gz
+./mirror-registry install --initPassword discopass   (The mirror-registry install options allow users to provide their own certificate, if they were issued one, using the --sslCert option.)
+
+# trust the mirror-registry TLS certificate requried for openshift installation
+sudo cp -v $HOME/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quayCA.pem
+sudo update-ca-trust
+sudo update-ca-trust extrac
+
+# log into the registry (default pull secret for podman: $XDG_RUNTIME_DIR/containers/auth.json where docker is .docker/config.json)
+podman login -u init -p discopass $(hostname):8443
+
+# publish openshift content to mirror registry:
+oc-mirror --from /path/to/archieves docker://hostname.reg.com
