@@ -8,10 +8,21 @@ mirror:
   platform:
     architectures:
     - amd64
+###############################################################
     channels:
-    - name: stable-4.16
+    - name: stable-4.16 # Want to grab specific releases
+      type: ocp
+      minVersion: 4.16.1
+      maxVersion: 4.16.20
+      shortestPath: true
+    channels:
+    - name: stable-4.16 # grab latest
+##############################################################
     graph: true
   operators:
+  # if you want all operators
+  # catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
+  # full: True
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
     packages:
     - name: advanced-cluster-management
