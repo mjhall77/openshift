@@ -1,0 +1,6 @@
+---
+- oc-mirror github:
+  https://github.com/openshift/oc-mirror
+
+- repos:
+  - 
