@@ -37,30 +37,12 @@ mirror:
     - name: compliance-operator                                    
       channels:
       - name: stable 
-    - name: devspaces
-      channels:
-      - name: stable 
-    - name: devworkspace-operator
-      channels:
-      - name: fast
-    - name: file-integrity-operator                                   
-      channels:
-      - name: stable 
-    - name: jaeger-product 
-      channels:
-      - name: stable 
-    - name: kiali-ossm 
-      channels:
-      - name: stable 
     - name: kubevirt-hyperconverged
       channels:
       - name: stable
     - name: local-storage-operator
       channels:
       - name: stable
-    - name: loki-operator 
-      channels:
-      - name: stable-5.9 
     - name: mcg-operator 
       channels:
       - name: stable-4.16
@@ -76,19 +58,10 @@ mirror:
     - name: odf-operator 
       channels:
       - name: stable-4.16
-    - name: openshift-gitops-operator 
-      channels:
-      - name: latest
-    - name: openshift-pipelines-operator-rh 
-      channels:
-      - name: latest
     - name: rhacs-operator 
       channels:
       - name: stable 
     - name: serverless-operator                                     
-      channels:
-      - name: stable 
-    - name: servicemeshoperator
       channels:
       - name: stable 
 
