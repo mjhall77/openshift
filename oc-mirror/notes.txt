@@ -1,24 +1,25 @@
 # Repos
 oc-mirror github: https://github.com/openshift/oc-mirror
+openshift clients:  https://mirror.openshift.com/pub/openshift-v4/clients/ocp/
 
+----- instructions -------
 
 # Add oc-mirror binary:
-cd /mnt/low-side-data/
 curl -L -o oc-mirror.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/oc-mirror.tar.gz
 tar -xzf oc-mirror.tar.gz
 rm -f oc-mirror.tar.gz
 chmod +x oc-mirror
-sudo cp -v oc-mirror /bin
+sudo mv oc-mirror /bin
 
 # Add oc cli:
 curl -L -o oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
 tar -xzf oc.tar.gz oc
 rm -f oc.tar.gz
-sudo cp -v oc /bin
+sudo mv oc /bin
 
 # create ~/.docker/config.json file with pull secret (get pull secret from https://console.redhat.com/openshift/install/pull-secret)
 mkdir -v $HOME/.docker
-cp -v $HOME/pull-secret-example.json $HOME/.docker/config.json
+cp -v $HOME/pull-secret $HOME/.docker/config.json
 
 # Create imageset configuration file, see example in repo 
 
