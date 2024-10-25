@@ -14,3 +14,9 @@ podman login -u init -p discopass $<hostname>:8443 --compat-auth-file ~/.docker/
 
 # publish openshift content to mirror registry:
 oc-mirror --from /path/to/archieves docker://<hostname>:8443
+
+# To validate operators in local registry
+oc-mirror list operators --catalog=wk-laptop.mikeynet.com:8443/redhat/redhat-operator-index:v4.16
+
+# View in web browser
+https://localhost:8443
