@@ -7,10 +7,10 @@ tar -xzvf mirror-registry.tar.gz
 # trust the mirror-registry TLS certificate requried for openshift installation
 sudo cp -v $HOME/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quayCA.pem
 sudo update-ca-trust
-sudo update-ca-trust extrac
+sudo update-ca-trust extract
 
 # log into the registry (default pull secret for podman: $XDG_RUNTIME_DIR/containers/auth.json where docker is .docker/config.json)
-podman login -u init -p discopass $(hostname):8443
+podman login -u init -p discopass $<hostname>:8443 --compat-auth-file ~/.docker/config.json
 
 # publish openshift content to mirror registry:
-oc-mirror --from /path/to/archieves docker://hostname.reg.com
+oc-mirror --from /path/to/archieves docker://<hostname>:8443
