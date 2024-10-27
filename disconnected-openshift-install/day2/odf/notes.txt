@@ -1,0 +1,22 @@
+# Configure ODF on bare metal with local-storage operator:  
+#  https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.16/html/deploying_openshift_data_foundation_using_bare_metal_infrastructure/deploy-using-local-storage-devices-bm#creating-openshift-data-foundation-cluster-on-bare-metal_local-bare-metal
+
+
+
+
+------- extras ----------
+
+# List the storage class:
+$ oc get storageclass
+NAME                                    PROVISIONER                             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+ocs-storagecluster-ceph-rbd (default)   openshift-storage.rbd.csi.ceph.com      Delete          Immediate              true                   29h
+ocs-storagecluster-ceph-rgw             openshift-storage.ceph.rook.io/bucket   Delete          Immediate              false                  29h
+ocs-storagecluster-cephfs               openshift-storage.cephfs.csi.ceph.com   Delete          Immediate              true                   29h
+odf-localstorage                        kubernetes.io/no-provisioner            Delete          WaitForFirstConsumer   false                  29h
+openshift-storage.noobaa.io             openshift-storage.noobaa.io/obc         Delete          Immediate              false                  29h
+
+# Disable "storageclass.kubernetes.io/is-default-class" annotation for the default StorageClass first:
+$ oc patch storageclass ocs-storagecluster-ceph-rbd -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+
+# Make another storage class the default (in this example, gp3-csi is configured as the default):
+$ oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
