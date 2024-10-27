@@ -1,0 +1,35 @@
+# The Image Registry Operator is not initially available for platforms that do not provide default storage. 
+# After installation, you must configure your registry to use storage so that the Registry Operator is made available.
+
+# Requirements
+- You have access to the cluster as a user with the cluster-admin role.
+- You have a cluster that uses manually-provisioned Red Hat Enterprise Linux CoreOS (RHCOS) nodes, such as bare metal.
+- You have provisioned persistent storage for your cluster, such as Red Hat OpenShift Data Foundation.
+- Must have 100Gi capacity available
+
+# Validate there is not an image-registry deployed
+oc get pod -n openshift-image-registry -l docker-registry=default
+
+# Create a PVC for the image regsitry
+oc apply -f odf-cephfs-pvc.yaml -n openshift-image-registry
+
+# Configure the image registry to use the CephFS file system storage 
+oc patch config.image/cluster -p '{"spec":{"managementState":"Managed","replicas":2,"storage":{"managementState":"Unmanaged","pvc":{"claim":"registry-storage-pvc"}}}}' --type=merge
+
+
+-------  Extras  -----------
+
+# Instead of logging in to the default OpenShift image registry from within the cluster, you can gain external access to it by exposing it with a route. 
+# This external access enables you to log in to the registry from outside the cluster using the route address and to tag and push images to an existing project by using the route host.
+
+oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge
+HOST=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')  # get default registry route
+oc get secret -n openshift-ingress  router-certs-default -o go-template='{{index .data "tls.crt"}}' | base64 -d | sudo tee /etc/pki/ca-trust/source/anchors/${HOST}.crt  > /dev/null   # get certificate of ingress operator
+sudo update-ca-trust enable
+sudo update-ca-trust extract
+sudo podman login -u kubeadmin -p $(oc whoami -t) $HOST
+
+
+# To manually edit the image registry
+oc edit configs.imageregistry.operator.openshift.io
+
