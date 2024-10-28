@@ -1,0 +1,56 @@
+# Using htpasswd authentication in OpenShift Container Platform allows you to identify users based on an htpasswd file. 
+# An htpasswd file is a flat file that contains the user name and hashed password for each user. 
+# You can use the htpasswd utility to create this file.
+
+# NOTE: With a default installation, self-provisioning is enabled with a ClusterRoleBinding that maps the self-provisioner role to a virtual group that represents authenticated users. 
+#       Users added with htpasswd will by default will be able to log into the cluster and create a project
+#       Since all users authenticated with oauth are automatically included in the system:authenticated: oauth virtual group, you will need can remove that role-binding. 
+#       However, then nobody will automatically get the self-provisioner role
+
+
+# htpasswd requires httpd-tools package to be installed
+
+# Create htpasswd   
+# NOTE: adding the -c flag will create the file, if a file already exists it will overwrite it 
+htpasswd -c -B </path/to/file> <username>
+
+# Update htpasswd
+htpasswd -B </path/to/file> <username>
+
+# Create an openshift secret in the openshift-config namespace for the htpasswd file
+oc create secret generic htpass-secret --from-file=htpasswd=/path/to/htpasswd -n openshift-config
+
+# Add indentity provider to the cluster by applying htpasswd-config.yaml 
+oc apply -f htpasswd-config.yaml -n openshift-config
+
+# Wait for new pods to deploy in openshift-authentication
+oc get po -n openshift-authentication -o wide
+
+------------------- Accounts Management ---------------------------
+# The following steps will disable project self-provisioning
+  oc describe clusterrolebinding.rbac self-provisioners    # view users granted role through binding
+  
+  oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth  # Removes system:authenticated:oauth from self-provisioner binding
+
+# Create group and add users
+oc adm groups new developers developer1 developer2
+
+# Create rolebindings
+oc policy add-role-to-user view <role > <username> -n <project>    # add cluster role to user in namespace - not cluster wide
+
+oc adm policy add-cluster-role-to-user <cluster role> <user>       # add cluster role to user - cluster wide
+
+oc adm policy add-cluster-role-to-group <cluster role> <group>       # add cluster role to group - cluster wide
+
+# Good to know
+   oc get clusterrole   # List of cluster roles
+
+   oc describe clusterrole self-provisioner   # View the permissions associated with the role
+
+   oc get rolebindings -n <project>   # view rolebindings for project
+
+   oc get clusterrolebindings         # view cluster role bindings
+
+   oc auth can-i <verb> <resource>    # see if account has permission to do verb on resource
+
+   oc adm policy who-can <verb> <resource>   # determine which users can do verb on resource
