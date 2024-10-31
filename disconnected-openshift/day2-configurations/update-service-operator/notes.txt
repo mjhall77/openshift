@@ -44,4 +44,4 @@ POLICY_ENGINE_GRAPH_URI="$(oc -n openshift-update-serivce get -o jsonpath='{.sta
 PATCH="{\"spec\":{\"upstream\":\"${POLICY_ENGINE_GRAPH_URI}\"}}"
 oc patch clusterversion version -p $PATCH --type merge
 
-Administrator -> Cluster is where kick off the update
+Administration -> Cluster Settings  is where kick off the update
