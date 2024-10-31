@@ -1,0 +1,47 @@
+# The Cluster Version Operator (CVO) is the primary component that orchestrates and facilitates the OpenShift Container Platform update process. 
+# During installation and standard cluster operation, the CVO is constantly comparing the manifests of managed cluster Operators to in-cluster 
+# resources, and reconciling discrepancies to ensure that the actual state of these resources match their desired state.
+
+# From the oc-mirror-workspace/results-<number> folder for the lastest image content ingest run the following
+oc apply -f imageContentSourcePolicy.yaml
+oc apply -f catalogSource-cs-redhat-operator-index.yaml     # Note if additional catalog sources apply them as well
+oc apply -f release-signatures/
+
+# Deploy the update service operator from the gui and keep the defaults
+
+# Configuring access to a secured registry for the update service
+# Create update-service-ca.yaml with the following content, only the updateservice-registry certificate is required.  
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: update-service-ca
+data:
+  updateservice-registry: | 
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+  registry-with-port.example.com..5000: | 
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+
+oc apply -f update-service-ca.yaml -n openshift-config
+
+oc edit image.config.openshift.io cluster
+
+spec:
+  additionalTrustedCA:
+    name: update-service-ca
+
+
+# Create the update service via the gui and provide the required content
+# name: cluster-update-service
+# graph-image is typically in openshift/graph-image, be sure to include the :latest tag
+# releases is typically openshift/release-images
+
+# Configure the Cluster Version Operator
+POLICY_ENGINE_GRAPH_URI="$(oc -n openshift-update-serivce get -o jsonpath='{.status.policyEngineURI}/api/upgrades_info/v1/graph{"\n"}' updateservice cluster-update-service)"
+PATCH="{\"spec\":{\"upstream\":\"${POLICY_ENGINE_GRAPH_URI}\"}}"
+oc patch clusterversion version -p $PATCH --type merge
+
+Administrator -> Cluster is where kick off the update
