@@ -26,7 +26,25 @@ oc apply -f htpasswd-config.yaml -n openshift-config
 # Wait for new pods to deploy in openshift-authentication
 oc get po -n openshift-authentication -o wide
 
-------------------- Accounts Management ---------------------------
+
+------------------ Add / remove users -------------------------------------
+
+#  extract current htpasswd secret 
+oc extract secret/htpass-secret --to - -n openshift-config > htpasswd
+
+# Add the entires to the htpasswd file
+htpasswd -B htpasswd USERNAME 
+
+# Remove entries simply remove the entry from the file and save
+
+# Replace secret with new one contianing the additional / removal htpasswd file
+oc create secret generic htpass-secret --from-file=htpasswd --dry-run -o yaml -n openshift-config | oc replace -f -
+
+# Check identity
+oc get identity
+
+------------------ Accounts Management ---------------------------
+
 # The following steps will disable project self-provisioning
   oc describe clusterrolebinding.rbac self-provisioners    # view users granted role through binding
   
