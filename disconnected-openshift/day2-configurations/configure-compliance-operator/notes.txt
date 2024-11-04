@@ -1,0 +1,29 @@
+# OpenShift Container Platform Compliance Operator (CO) runs compliance scans and provides remediations to assist users in meeting compliance standards
+
+# rule.compliance is a single compliance check. For example the rule rhcos4-service-auditd-enabled checks if the auditd daemon is running on RHCOS.
+# profile.compliance is a collection of rules that form a single compliance baseline for a product. 
+# profilebundle.compliance is a collection of profiles for a single product where product might be ocp4 or rhcos4.
+
+
+----------------------------- build a scan --------------------------------------------
+# Get a list of profiles.compliance
+oc get profiles.compliance.openshift.io -n openshift-compliance  
+
+# View the profile and list of rules 
+oc describe profiles.compliance.openshift.io rhcos4-stig-v2r1 -n openshift-compliance
+
+# View the profile bundles
+oc get profilebundles.compliance.openshift.io -n openshift-compliance
+
+# View contents of a rule
+oc get rule.compliance rhcos4-accounts-no-uid-except-zero -nopenshift-compliance -oyaml
+
+# Create Scan settings by applying the yaml file.  There are two important pieces of a ScanSettingBinding object:
+# profiles: Contains a list of (name,kind,apiGroup) tuples that make up a selection of the Profile (or a TailoredProfile that we will explain later) to scan your environment with.
+# settingsRef: A reference to a ScanSetting object also using the (name,kind,apiGroup) tuple that references the operational constraints.
+oc apply -f stig-scan-setting-binding.yaml -n openshift-compliance
+oc apply -f stig-scan-setting.yaml -n openshift-compliance
+
+# View progress of scans - depending on number of profiles and nodes it could take some time for the scans to complete
+oc get compliancesuites.compliance.openshift.io -n openshift-compliance
+oc get compliancescans.compliance.openshift.io -n openshift-compliance
