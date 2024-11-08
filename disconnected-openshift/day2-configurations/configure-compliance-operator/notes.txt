@@ -27,3 +27,33 @@ oc apply -f stig-scan-setting.yaml -n openshift-compliance
 # View progress of scans - depending on number of profiles and nodes it could take some time for the scans to complete
 oc get compliancesuites.compliance.openshift.io -n openshift-compliance
 oc get compliancescans.compliance.openshift.io -n openshift-compliance
+
+# View the checks that are not compliance with the rule
+oc get compliancecheckresults.compliance.openshift.io -n openshift-compliance
+
+# View the remediations for the rules that did not pass the check
+oc get complianceremediations.compliance.openshift.io -n openshift-compliance
+
+# Apply remediations -> This will cause the MachineConfig operoatr to create an object and do a rolling reboot all imapacted nodes
+$ oc patch complianceremediations rhcos4-e8-worker-sysctl-kernel-dmesg-restrict -p '{"spec":{"apply":true}}' --type=merge
+
+# To apply multiple remediaitons you will need to pause the MachineConfigPool -> Do not forget to unpause
+$ oc patch machineconfigpools worker -p '{"spec":{"paused":true}}' --type=merge
+
+------------------------ pull the reports -------------------------
+
+# To retrieve the scan results.  Define and spawn a pod that mounts the PVC and sleeps, 
+# then copy the files out of the PVC to a local filesystem.
+oc apply -f pv-extract.yaml -n openshift-compliance
+
+# Extract the scan results
+oc cp pv-extract:/master-scan-results ./extract_results_dir -n openshift-compliance
+
+# Delete the pv-extract pod due it mounting the pv
+oc delete pod pv-extract
+
+###NOTES Need to add content on what to do with the bzip2 files
+
+
+
+
