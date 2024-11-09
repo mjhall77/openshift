@@ -10,6 +10,9 @@ NTP Server known
 FIPS -> If requried jump host must be RHEL 9
 Storage device name known
 
+# Enable bash completion
+sudo oc completion bash > /etc/bash_completion.d/oc_bash_completion
+source /etc/bash_completion.d/oc_bash_completion
 
 --------- Agent installer Steps ------------------------------
 
