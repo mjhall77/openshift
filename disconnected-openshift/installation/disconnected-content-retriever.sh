@@ -137,6 +137,31 @@ additionalTrustBundle: |
 additionalTrustBundlePolicy: Always
 _EOF
 
+cat > mirror-registry/notes.txt <<'_EOF'
+# set up temporary container registry
+# Additional Doc on setting it up:  https://www.redhat.com/en/blog/introducing-mirror-registry-for-red-hat-openshift
+curl -L -o mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
+tar -xzvf mirror-registry.tar.gz
+./mirror-registry install --initPassword discopass   (The mirror-registry install options allow users to provide their own certificate, if they were issued one, using the --sslCert option.)
+
+# trust the mirror-registry TLS certificate requried for openshift installation
+sudo cp -v $HOME/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quayCA.pem
+sudo update-ca-trust
+sudo update-ca-trust extract
+
+# log into the registry (default pull secret for podman: $XDG_RUNTIME_DIR/containers/auth.json where docker is .docker/config.json)
+podman login -u init -p discopass $<hostname>:8443 --compat-auth-file ~/.docker/config.json
+
+# publish openshift content to mirror registry:
+oc-mirror --from /path/to/archieves docker://<hostname>:8443
+
+# To validate operators in local registry
+oc-mirror list operators --catalog=wk-laptop.mikeynet.com:8443/redhat/redhat-operator-index:v4.16
+
+# View in web browser
+https://localhost:8443
+_EOF
+
 cat > oc-mirror-configs/oc-mirror.txt <<'_EOF'
 # Repos
 oc-mirror github: https://github.com/openshift/oc-mirror
@@ -201,6 +226,8 @@ while true; do
 		tar -xvf  agents_${ocp_version}/oc-mirror.tar.gz -C oc-mirror-configs/
 		chmod 775 oc-mirror-configs/oc-mirror
 		./oc-mirror-configs/oc-mirror --config=./oc-mirror-configs/imageset-config.yaml file://oc-mirror-image-content
+		printf "\nGenerating tarball of installattion artifacts"
+		tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-image-content mkdir oc-mirror-configs openshift-installation-configs oc-mirror-image-content
 		break;;
 	[Nn]* )
 		cat > oc-mirror-configs/image-set-configuration-template.yaml <<'_EOF'
@@ -278,33 +305,9 @@ mirror:
   - name: registry.redhat.io/ubi8/nodejs-18:latest
   - name: registry.redhat.io/ubi8/nodejs-18-minimal:latest
 _EOF
-
-cat > mirror-registry/notes.txt <<'_EOF'
-# set up temporary container registry
-# Additional Doc on setting it up:  https://www.redhat.com/en/blog/introducing-mirror-registry-for-red-hat-openshift
-curl -L -o mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
-tar -xzvf mirror-registry.tar.gz
-./mirror-registry install --initPassword discopass   (The mirror-registry install options allow users to provide their own certificate, if they were issued one, using the --sslCert option.)
-
-# trust the mirror-registry TLS certificate requried for openshift installation
-sudo cp -v $HOME/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quayCA.pem
-sudo update-ca-trust
-sudo update-ca-trust extract
-
-# log into the registry (default pull secret for podman: $XDG_RUNTIME_DIR/containers/auth.json where docker is .docker/config.json)
-podman login -u init -p discopass $<hostname>:8443 --compat-auth-file ~/.docker/config.json
-
-# publish openshift content to mirror registry:
-oc-mirror --from /path/to/archieves docker://<hostname>:8443
-
-# To validate operators in local registry
-oc-mirror list operators --catalog=wk-laptop.mikeynet.com:8443/redhat/redhat-operator-index:v4.16
-
-# View in web browser
-https://localhost:8443
-_EOF
+		printf "\nGenerating tarball of installattion artifacts"
+		tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-image-content mkdir oc-mirror-configs openshift-installation-configs 
 		break;;
 	*) printf "Invalid response.  Pleast enter (y/n)" ;;	
 	esac
 done
-
