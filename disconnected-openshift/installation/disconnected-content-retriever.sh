@@ -226,8 +226,6 @@ while true; do
 		tar -xvf  agents_${ocp_version}/oc-mirror.tar.gz -C oc-mirror-configs/
 		chmod 775 oc-mirror-configs/oc-mirror
 		./oc-mirror-configs/oc-mirror --config=./oc-mirror-configs/imageset-config.yaml file://oc-mirror-image-content
-		printf "\nGenerating tarball of installattion artifacts"
-		tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-image-content mkdir oc-mirror-configs openshift-installation-configs oc-mirror-image-content
 		break;;
 	[Nn]* )
 		cat > oc-mirror-configs/image-set-configuration-template.yaml <<'_EOF'
@@ -305,9 +303,11 @@ mirror:
   - name: registry.redhat.io/ubi8/nodejs-18:latest
   - name: registry.redhat.io/ubi8/nodejs-18-minimal:latest
 _EOF
-		printf "\nGenerating tarball of installattion artifacts"
-		tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-image-content mkdir oc-mirror-configs openshift-installation-configs 
 		break;;
 	*) printf "Invalid response.  Pleast enter (y/n)" ;;	
 	esac
 done
+
+printf "\nGenerating tarball of installattion artifacts"
+tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-image-content oc-mirror-configs openshift-installation-configs oc-mirror-image-content
+rm -rf mirror-registry agents_${ocp_version} oc-mirror-image-content oc-mirror-configs openshift-installation-configs oc-mirror-image-content

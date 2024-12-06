@@ -65,7 +65,9 @@ oc adm policy add-cluster-role-to-group <cluster role> <group>       # add clust
 
    oc describe clusterrole self-provisioner   # View the permissions associated with the role
 
-   oc get rolebindings -n <project>   # view rolebindings for project
+   oc get rolebindings.rbac -n <project>   # view rolebindings for project
+
+   oc describe rolebinding.rbac -n <project>    #view rolebindings for project
 
    oc get clusterrolebindings         # view cluster role bindings
 
