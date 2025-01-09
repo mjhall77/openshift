@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  namespace: metallb-system
+  name: mikeynet-ipaddresspool
+  labels: 
+    zone: mikeynet
+spec:
+  addresses:
+  - 192.168.1.30-192.168.1.40
