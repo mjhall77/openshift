@@ -1,0 +1,33 @@
+# The following example snippet creates a bond that is named bond10 across two NICs and a Linux bridge that is named br1 that connects to the bond.
+
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br1-eth1-policy    # name of policy
+spec:
+  nodeSelector:             
+    node-role.kubernetes.io/worker: "" 
+  desiredState:
+    interfaces:
+    - name: bond10
+      description: Bonding eth2 and eth3 for Linux bridge
+      type: bond
+      state: up
+      link-aggregation:
+        port:
+        - eth2
+        - eth3
+    - name: br1
+      description: Linux bridge on bond
+      type: linux-bridge
+      state: up
+      bridge:
+        port:
+        - name: bond10
+    dns-resolver: 
+      config:
+        search:
+        - example.com
+        - example.org
+        server:
+        - 8.8.8.8

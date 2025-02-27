@@ -1,0 +1,16 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vlan-eth1-policy 
+spec:
+  nodeSelector: 
+    kubernetes.io/hostname: <node01> 
+  desiredState:
+    interfaces:
+    - name: eth1.102 
+      description: VLAN using eth1 
+      type: vlan 
+      state: up 
+      vlan:
+        base-iface: eth1 
+        id: 102 
