@@ -1,0 +1,55 @@
+apiVersion: v1
+baseDomain:
+metadata:
+  name: << clustername >>
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr:
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+compute:
+- name: worker
+  replicas: 0
+controlPlane:
+  name: master
+  replicas: 3
+platform:
+  none: {}
+  baremetal: # bare metal example
+    hosts:
+      - name: <Control plan 1>
+        bootMACAddress:
+      - name: <Control plan 2>
+        bootMACAddress:
+      - name: <Contorl plan 3>
+        bootMACAddress:
+    apiVIPs:         # api.<clustername>.<basedomain> and api-int.<clustername>.<basedoman>
+    -
+    ingressVIPs:     # *.apps.<clustername>.<basedomain>
+    -
+fips: false
+pullSecret: ' <Pull secret for disconnected registry> '
+sshKey: "ssh-rsa "
+imageDigestSources:   # The following entries can be pulled from imageContentsourcepolicy.yaml produced by oc-mirror
+- mirrors:
+  - <FQDN of regsitry>:<PORT>/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - <FQDN of registry>:<PORT>/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  -----END CERTIFICATE-----
+additionalTrustBundlePolicy: Always
+imageContentSources:
+  - mirrors:
+    - registry.ocp4.example.com:5000/ocp4/openshift4
+    source: quay.io/openshift-release-dev/ocp-release-nightly
+  - mirrors:
+    - registry.ocp4.example.com:5000/ocp4/openshift4
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+

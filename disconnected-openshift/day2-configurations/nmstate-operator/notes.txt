@@ -1,0 +1,10 @@
+# Kubernetes nmstate documentation:  https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/html/networking/kubernetes-nmstate#installing-the-kubernetes-nmstate-operator-CLI_k8s-nmstate-operator
+
+# Easiest to deploy operator via gui but IaC is located in documents 
+
+# CRDs to care about
+  - NodeNetworkState -> Current configuration
+  - NodeNetworkconfigurationPolicy -> add network interfaces to bridges -> OVS and mappings
+    - Configure NetworkAttachmentDefinition (NAD) provided by multus to connect pod / vm to network
+
+# The configuration files has examples configurations

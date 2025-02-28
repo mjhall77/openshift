@@ -13,11 +13,18 @@ if [ ! -d openshift-installation-configs ]; then mkdir openshift-installation-co
 
 printf "Getting ${ocp_version} agents required for disconnected installation \n"
 
-printf "openshift-client-linux-${ocp_version}.tar.gz \n"
-if [ ! -f agents_${ocp_version}/openshift-client-linux-${ocp_version}.tar.gz ]; then
-	curl -L -o agents_${ocp_version}/openshift-client-linux-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-${ocp_version}.tar.gz
+printf "openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
+if [ ! -f agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz ]; then
+	curl -L -o agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/openshift-client-linux-${ocp_version}.tar.gz \n"
+	printf "Already pulled agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
+fi
+
+printf "openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
+if [ ! -f agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz ]; then
+	curl -L -o agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz
+else
+	printf "Already pulled agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
 fi
 
 printf "oc-mirror.tar.gz \n"
@@ -41,12 +48,39 @@ else
 	printf "Already pulled agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz \n"
 fi
 
+printf "openshift-install-rhel9-amd64.tar.gz\n"
+if [ ! -f agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz ]; then
+	curl -l -o agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-install-rhel9-amd64.tar.gz
+else
+	printf "Already pulled agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz \n"
+fi
+
+printf "butane-adm64\n"
+if [ ! -f agents_${ocp_version}/butane-amd64 ]; then
+        curl -L -o agents_${ocp_version}/butane-amd64 https://mirror.openshift.com/pub/openshift-v4/clients/butane/latest/butane-amd64
+else
+        printf "Already pulled agents_${ocp_version}/butane-amd64\n"
+fi
+
+printf "helm-linux-amd64.tar.gz\n"
+if [ ! -f agents_${ocp_version}/helm-linux-amd64.tar.gz ]; then
+        curl -L -o agents_${ocp_version}/helm-linux-amd64.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64.tar.gz
+else
+        printf "Already pulled agents_${ocp_version}/helm-linux-amd64.tar.gz\n"
+fi
+
+printf "virtctl\n"
+virtctl_version=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
+curl -L -o agents_${ocp_version}/virtctl-${virtctl_version}-linux-amd64 https://github.com/kubevirt/kubevirt/releases/download/${virtctl_version}/virtctl-${virtctl_version}-linux-amd64
+printf "Virtctl pulled\n"
+
 printf "mirror-registry.tar.gz\n"
 if [ ! -f mirror-registry/mirror-registry.tar.gz ]; then
 	curl -L -o mirror-registry/mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
 else
 	printf "Already pulled mirror-registry/mirror-registry.tar.gz\n"
 fi
+
 
 ################################################################################################################
 # The following is documentation to include with the disconnected package to be transferred to the remote system
@@ -135,6 +169,98 @@ additionalTrustBundle: |
   -----BEGIN CERTIFICATE-----
   -----END CERTIFICATE-----
 additionalTrustBundlePolicy: Always
+
+------------------ bonded with vlan example  ---------------------------------
+  - hostname: master0
+    role: master
+    interfaces:
+     - name: enp0s4
+       macAddress: 00:21:50:90:c0:10
+     - name: enp0s5
+       macAddress: 00:21:50:90:c0:20
+    networkConfig:
+      interfaces:
+        - name: bond0.300
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.10.10.14
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:21:50:90:c0:10
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150"
+            port:
+             - enp0s4
+             - enp0s5
+      dns-resolver:
+        config:
+          server:
+            - 10.10.10.11
+            - 10.10.10.12
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.10.10.10
+            next-hop-interface: bond0.300
+            table-id: 254
+
+------------------- static SNO example ---------------------------------
+
+apiVersion: v1beta1
+kind: AgentConfig
+metadata:
+  name: << name oc cluster example: sno-cluster >>
+rendezvousIP: << ip of SNO server example: 192.168.111.80 >>
+additionalNTPSources:
+  - 0.north-america.pool.ntp.org
+  - 1.north-america.pool.ntp.org
+hosts:
+  - hostname: << server name short/fqdn exmaple: master-0 >>
+    interfaces:
+      - name: << interface name example: eno1 >>
+        macAddress: << interface mac example: 00:ef:44:21:e6:a5 >>
+    rootDeviceHints:
+      deviceName: << install drive exmaple: /dev/sdb >>
+    networkConfig:
+      interfaces:
+        - name: << interface name example: eno1 >>
+          type: ethernet
+          state: up
+          mac-address: << interface mac example: 00:ef:44:21:e6:a5 >>
+          ipv4:
+            enabled: true
+            address:
+              - ip: << ip address example: 192.168.111.80 >>
+                prefix-length: << subnet example: 24 >>
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - << dns server example: 192.168.111.1 >>
+            - << dns server2 example: 192.168.111.2 >>
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: << default gw example: 192.168.111.2 >>
+            next-hop-interface: << interface name example: eno1 >>
+            table-id: 254
+
+
 _EOF
 
 cat > mirror-registry/notes.txt <<'_EOF'

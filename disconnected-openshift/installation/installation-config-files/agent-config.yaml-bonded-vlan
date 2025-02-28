@@ -1,0 +1,57 @@
+### agent-config.yaml-bonded-vlan  #####
+
+apiVersion: v1alpha1
+kind: AgentConfig
+rendezvousIP: 10.10.10.14
+additionalNTPSources:
+  - 0.north-america.pool.ntp.org
+  - 1.north-america.pool.ntp.org
+hosts:
+  - hostname: master0
+    role: master
+    interfaces:
+     - name: enp0s4
+       macAddress: 00:21:50:90:c0:10
+     - name: enp0s5
+       macAddress: 00:21:50:90:c0:20
+    networkConfig:
+      interfaces:
+        - name: bond0.300
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.10.10.14
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:21:50:90:c0:10
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150"
+            port:
+             - enp0s4
+             - enp0s5
+      dns-resolver:
+        config:
+          server:
+            - 10.10.10.11
+            - 10.10.10.12
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.10.10.10
+            next-hop-interface: bond0.300
+            table-id: 254
+

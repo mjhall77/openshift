@@ -1,0 +1,39 @@
+apiVersion: v1beta1
+kind: AgentConfig
+metadata:
+  name: << name oc cluster example: sno-cluster >>
+rendezvousIP: << ip of SNO server example: 192.168.111.80 >>
+additionalNTPSources:
+  - 0.north-america.pool.ntp.org
+  - 1.north-america.pool.ntp.org
+hosts:
+  - hostname: << server name short/fqdn exmaple: master-0 >>
+    interfaces:
+      - name: << interface name example: eno1 >>
+        macAddress: << interface mac example: 00:ef:44:21:e6:a5 >>
+    rootDeviceHints:
+      deviceName: << install drive exmaple: /dev/sdb >>
+    networkConfig:
+      interfaces:
+        - name: << interface name example: eno1 >>
+          type: ethernet
+          state: up
+          mac-address: << interface mac example: 00:ef:44:21:e6:a5 >>
+          ipv4:
+            enabled: true
+            address:
+              - ip: << ip address example: 192.168.111.80 >>
+                prefix-length: << subnet example: 24 >>
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - << dns server example: 192.168.111.1 >>
+            - << dns server2 example: 192.168.111.2 >>
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: << default gw example: 192.168.111.2 >>
+            next-hop-interface: << interface name example: eno1 >>
+            table-id: 254
+
