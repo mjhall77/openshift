@@ -3,82 +3,85 @@
 # openshift installation with the final output being a tarball that can be transferred
 # to the disconnected environment
 
+base_dir=/home/mikhall/CLIENTS/
+
+read -p "What is the project name": project_name
 read -p "What release of Openshift: " ocp_version
 
-if [ ! -d mirror-registry ]; then mkdir mirror-registry ; fi 
-if [ ! -d agents_${ocp_version} ]; then mkdir agents_${ocp_version}; fi
-if [ ! -d oc-mirror-image-content ]; then mkdir oc-mirror-image-content; fi 
-if [ ! -d oc-mirror-configs ]; then mkdir oc-mirror-configs; fi
-if [ ! -d openshift-installation-configs ]; then mkdir openshift-installation-configs; fi
+if [ ! -d ${base_dir}/${project_name}/mirror-registry ]; then mkdir -p ${base_dir}/${project_name}/mirror-registry ; fi 
+if [ ! -d ${base_dir}/${project_name}/agents_${ocp_version} ]; then mkdir -p ${base_dir}/${project_name}/agents_${ocp_version}; fi
+if [ ! -d ${base_dir}/${project_name}/oc-mirror-image-content ]; then mkdir -p ${base_dir}/${project_name}/oc-mirror-image-content; fi 
+if [ ! -d ${base_dir}/${project_name}/oc-mirror-configs ]; then mkdir -p ${base_dir}/${project_name}/oc-mirror-configs; fi
+if [ ! -d ${base_dir}/${project_name}/openshift-installation-configs ]; then mkdir -p ${base_dir}/${project_name}/openshift-installation-configs; fi
 
 printf "Getting ${ocp_version} agents required for disconnected installation \n"
 
 printf "openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
-if [ ! -f agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz ]; then
-	curl -L -o agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz ]; then
+	curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
+	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
 fi
 
 printf "openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
-if [ ! -f agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz ]; then
-	curl -L -o agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz ]; then
+	curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
+	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
 fi
 
 printf "oc-mirror.tar.gz \n"
-if [ ! -f agents_${ocp_version}/oc-mirror.tar.gz ]; then
-	curl -l -o agents_${ocp_version}/oc-mirror.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/oc-mirror.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/oc-mirror.tar.gz ]; then
+	curl -l -o ${base_dir}/${project_name}/agents_${ocp_version}/oc-mirror.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/oc-mirror.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/oc-mirror.tar.gz \n"
+	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/oc-mirror.tar.gz \n"
 fi
 
 printf "oc-mirror.rhel9.tar.gz\n"
-if [ ! -f agents_${ocp_version}/oc-mirror.rhel9.tar.gz ]; then
-	curl -l -o agents_${ocp_version}/oc-mirror.rhel9.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/oc-mirror.rhel9.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/oc-mirror.rhel9.tar.gz ]; then
+	curl -l -o ${base_dir}/${project_name}/agents_${ocp_version}/oc-mirror.rhel9.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/oc-mirror.rhel9.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/oc-mirror.rhel9.tar.gz \n"
+	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/oc-mirror.rhel9.tar.gz \n"
 fi
 
 printf "openshift-install-linux.tar.gz\n"
-if [ ! -f agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz ]; then
-	curl -l -o agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-install-linux.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz ]; then
+	curl -l -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-install-linux.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz \n"
+	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/openshift-install-linux.${ocp_version}.tar.gz \n"
 fi
 
 printf "openshift-install-rhel9-amd64.tar.gz\n"
-if [ ! -f agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz ]; then
-	curl -l -o agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-install-rhel9-amd64.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz ]; then
+	curl -l -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-install-rhel9-amd64.tar.gz
 else
-	printf "Already pulled agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz \n"
+	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/openshift-install-rhel9-amd64.tar.gz \n"
 fi
 
 printf "butane-adm64\n"
-if [ ! -f agents_${ocp_version}/butane-amd64 ]; then
-        curl -L -o agents_${ocp_version}/butane-amd64 https://mirror.openshift.com/pub/openshift-v4/clients/butane/latest/butane-amd64
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/butane-amd64 ]; then
+        curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/butane-amd64 https://mirror.openshift.com/pub/openshift-v4/clients/butane/latest/butane-amd64
 else
-        printf "Already pulled agents_${ocp_version}/butane-amd64\n"
+        printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/butane-amd64\n"
 fi
 
 printf "helm-linux-amd64.tar.gz\n"
-if [ ! -f agents_${ocp_version}/helm-linux-amd64.tar.gz ]; then
-        curl -L -o agents_${ocp_version}/helm-linux-amd64.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64.tar.gz
+if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/helm-linux-amd64.tar.gz ]; then
+        curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/helm-linux-amd64.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64.tar.gz
 else
-        printf "Already pulled agents_${ocp_version}/helm-linux-amd64.tar.gz\n"
+        printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/helm-linux-amd64.tar.gz\n"
 fi
 
 printf "virtctl\n"
 virtctl_version=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
-curl -L -o agents_${ocp_version}/virtctl-${virtctl_version}-linux-amd64 https://github.com/kubevirt/kubevirt/releases/download/${virtctl_version}/virtctl-${virtctl_version}-linux-amd64
+curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/virtctl-${virtctl_version}-linux-amd64 https://github.com/kubevirt/kubevirt/releases/download/${virtctl_version}/virtctl-${virtctl_version}-linux-amd64
 printf "Virtctl pulled\n"
 
 printf "mirror-registry.tar.gz\n"
-if [ ! -f mirror-registry/mirror-registry.tar.gz ]; then
-	curl -L -o mirror-registry/mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
+if [ ! -f ${base_dir}/${project_name}/mirror-registry/mirror-registry.tar.gz ]; then
+	curl -L -o ${base_dir}/${project_name}/mirror-registry/mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
 else
-	printf "Already pulled mirror-registry/mirror-registry.tar.gz\n"
+	printf "Already pulled ${base_dir}/${project_name}/mirror-registry/mirror-registry.tar.gz\n"
 fi
 
 
@@ -87,7 +90,7 @@ fi
 ################################################################################################################
 
 ## Example agent-config.yaml 
-cat > openshift-installation-configs/template-agent-config.yaml <<'_EOF'
+cat > ${base_dir}/${project_name}/openshift-installation-configs/template-agent-config.yaml <<'_EOF'
 apiVersion: v1beta1
 kind: AgentConfig
 metadata:
@@ -121,7 +124,7 @@ hosts:
 _EOF
 
 ## Example install-config.yaml
-cat > openshift-installation-configs/template-install-config.yaml <<'_EOF'
+cat > ${base_dir}/${project_name}/openshift-installation-configs/template-install-config.yaml <<'_EOF'
 apiVersion: v1
 baseDomain:
 metadata:
@@ -263,7 +266,7 @@ hosts:
 
 _EOF
 
-cat > mirror-registry/notes.txt <<'_EOF'
+cat > ${base_dir}/${project_name}/mirror-registry/notes.txt <<'_EOF'
 # set up temporary container registry
 # Additional Doc on setting it up:  https://www.redhat.com/en/blog/introducing-mirror-registry-for-red-hat-openshift
 curl -L -o mirror-registry.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/1.3.9/mirror-registry.tar.gz
@@ -288,7 +291,7 @@ oc-mirror list operators --catalog=wk-laptop.mikeynet.com:8443/redhat/redhat-ope
 https://localhost:8443
 _EOF
 
-cat > oc-mirror-configs/oc-mirror.txt <<'_EOF'
+cat > ${base_dir}/${project_name}/oc-mirror-configs/oc-mirror.txt <<'_EOF'
 # Repos
 oc-mirror github: https://github.com/openshift/oc-mirror
 openshift clients:  https://mirror.openshift.com/pub/openshift-v4/clients/ocp/
@@ -311,6 +314,9 @@ sudo mv oc /bin
 # create ~/.docker/config.json file with pull secret (get pull secret from https://console.redhat.com/openshift/install/pull-secret)
 mkdir -v $HOME/.docker
 cp -v $HOME/pull-secret $HOME/.docker/config.json
+
+# For disconnected registry
+podman login -u << username >> --auth-file=./local_pull_secret.json << registry_name:port >>
 
 # Create imageset configuration file, see example in repo
 
@@ -343,15 +349,10 @@ while true; do
   read -p "Run oc-mirror (y/n): " answer
   case "$answer" in
 	[Yy]* )
-	     	read -p "full path to ImageSetConfiguration file: " isc_file
-		if [ ! -f $isc_file ]; then
-			printf "Could not find $isc_file, cannot run oc-mirror...  \n"
+		if [ ! -f ${base_dir}/${project_name}/imageset-config.yaml ]; then
+			printf "Could not find ${base_dir}/${project_name}/imageset-config.yaml, cannot run oc-mirror...  \n"
 		fi
-		printf "Copying $isc_file to oc-mirror-configs\n"
-		cp $isc_file oc-mirror-configs
-		tar -xvf  agents_${ocp_version}/oc-mirror.tar.gz -C oc-mirror-configs/
-		chmod 775 oc-mirror-configs/oc-mirror
-		./oc-mirror-configs/oc-mirror --config=./oc-mirror-configs/imageset-config.yaml file://oc-mirror-image-content
+		oc-mirror --config= ${base_dir}/${project_name}/imageset-config.yaml file://oc-mirror-image-content
 		break;;
 	[Nn]* )
 		cat > oc-mirror-configs/image-set-configuration-template.yaml <<'_EOF'
@@ -435,5 +436,5 @@ _EOF
 done
 
 printf "\nGenerating tarball of installattion artifacts"
-tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-image-content oc-mirror-configs openshift-installation-configs oc-mirror-image-content
-rm -rf mirror-registry agents_${ocp_version} oc-mirror-image-content oc-mirror-configs openshift-installation-configs oc-mirror-image-content
+tar -cvf ${base_dir}/${project_name}/${ocp_version}-disconnected-installation-components.tgz ${base_dir}/${project_name}mirror-registry ${base_dir}/${project_name}agents_${ocp_version} ${base_dir}/${project_name}oc-mirror-configs ${base_dir}/${project_name}openshift-installation-configs 
+rm -rf mirror-registry agents_${ocp_version} ${base_dir}/${project_name}oc-mirror-image-content ${base_dir}/${project_name}oc-mirror-configs ${base_dir}/${project_name}openshift-installation-configs ${base_dir}/${project_name}mirror-registry
