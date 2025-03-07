@@ -5,14 +5,17 @@
 
 base_dir=/home/mikhall/CLIENTS/
 
-read -p "What is the project name": project_name
+read -p "What is the project name: " project_name
 read -p "What release of Openshift: " ocp_version
 
 if [ ! -d ${base_dir}/${project_name}/mirror-registry ]; then mkdir -p ${base_dir}/${project_name}/mirror-registry ; fi 
 if [ ! -d ${base_dir}/${project_name}/agents_${ocp_version} ]; then mkdir -p ${base_dir}/${project_name}/agents_${ocp_version}; fi
-if [ ! -d ${base_dir}/${project_name}/oc-mirror-image-content ]; then mkdir -p ${base_dir}/${project_name}/oc-mirror-image-content; fi 
 if [ ! -d ${base_dir}/${project_name}/oc-mirror-configs ]; then mkdir -p ${base_dir}/${project_name}/oc-mirror-configs; fi
 if [ ! -d ${base_dir}/${project_name}/openshift-installation-configs ]; then mkdir -p ${base_dir}/${project_name}/openshift-installation-configs; fi
+
+####### should I include pulling the .iso from the depenedices directory for non agent installations ################
+
+cp openshift-helper-tools.tar ${base_dir}/${project_name}/openshift-installation-configs/
 
 printf "Getting ${ocp_version} agents required for disconnected installation \n"
 
@@ -349,92 +352,21 @@ while true; do
   read -p "Run oc-mirror (y/n): " answer
   case "$answer" in
 	[Yy]* )
-		if [ ! -f ${base_dir}/${project_name}/imageset-config.yaml ]; then
-			printf "Could not find ${base_dir}/${project_name}/imageset-config.yaml, cannot run oc-mirror...  \n"
+		if [ ! -f ${base_dir}${project_name}/imageset-config.yaml ]; then
+			printf "Could not find ${base_dir}${project_name}/imageset-config.yaml, cannot run oc-mirror...  \n"
 		fi
-		oc-mirror --config= ${base_dir}/${project_name}/imageset-config.yaml file://oc-mirror-image-content
+		cp installation-config-files/imageset-config.yaml-template ${base_dir}${project_name}/oc-mirror-configs/
+		cd ${base_dir}${project_name}
+		oc-mirror --config=imageset-config.yaml file://oc-mirror-image-content
 		break;;
 	[Nn]* )
-		cat > oc-mirror-configs/image-set-configuration-template.yaml <<'_EOF'
-kind: ImageSetConfiguration
-apiVersion: mirror.openshift.io/v1alpha2
-archiveSize: 5
-storageConfig:
-  local:
-    path: ./imageset-back-end
-mirror:
-  platform:
-    architectures:
-    - amd64
-###############################################################
-    channels:
-    - name: stable-4.16 # Want to grab specific releases
-      type: ocp
-      minVersion: 4.16.1
-      maxVersion: 4.16.16
-      shortestPath: true
-    channels:
-    - name: stable-4.16 # grab latest
-##############################################################
-    graph: true
-  operators:
-  # if you want all operators
-  # catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
-  # full: True
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
-    packages:
-    - name: advanced-cluster-management
-      channels:
-      - name: release-2.11
-    - name: cincinnati-operator
-      channels:
-      - name: v1 
-    - name: cluster-logging                                    
-      channels:
-      - name: stable-5.9 
-    - name: compliance-operator                                    
-      channels:
-      - name: stable 
-    - name: kubevirt-hyperconverged
-      channels:
-      - name: stable
-    - name: local-storage-operator
-      channels:
-      - name: stable
-    - name: mcg-operator 
-      channels:
-      - name: stable-4.16
-    - name: ocs-client-operator
-      channels: 
-      - name: stable-4.16
-    - name: ocs-operator
-      channels:
-      - name: stable-4.16
-    - name: odf-csi-addons-operator 
-      channels:
-      - name: stable-4.16
-    - name: odf-operator 
-      channels:
-      - name: stable-4.16
-    - name: rhacs-operator 
-      channels:
-      - name: stable 
-    - name: serverless-operator                                     
-      channels:
-      - name: stable 
-
-  additionalImages:
-  - name: registry.redhat.io/ubi8/ubi:latest
-  - name: registry.redhat.io/ubi9/ubi:latest
-  - name: registry.redhat.io/rhel8/support-tools:latest
-  - name: registry.redhat.io/ubi8/nodejs-18:latest
-  - name: registry.redhat.io/ubi8/nodejs-18-minimal:latest
-_EOF
+		cp installation-config-files/imageset-config.yaml-template ${base_dir}${project_name}/oc-mirror-configs/
 		break;;
 	*) printf "Invalid response.  Pleast enter (y/n)" ;;	
 	esac
 done
 
 printf "\nGenerating tarball of installattion artifacts"
-tar -cvf ${base_dir}/${project_name}/${ocp_version}-disconnected-installation-components.tgz ${base_dir}/${project_name}mirror-registry ${base_dir}/${project_name}agents_${ocp_version} ${base_dir}/${project_name}oc-mirror-configs ${base_dir}/${project_name}openshift-installation-configs 
-rm -rf mirror-registry agents_${ocp_version} ${base_dir}/${project_name}oc-mirror-image-content ${base_dir}/${project_name}oc-mirror-configs ${base_dir}/${project_name}openshift-installation-configs ${base_dir}/${project_name}mirror-registry
+cd ${base_dir}${project_name}
+tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs 
+rm -rf mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs 
