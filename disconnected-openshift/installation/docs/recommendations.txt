@@ -1,0 +1,4 @@
+# Enable bash completion
+sudo oc completion bash > /etc/bash_completion.d/oc_bash_completion
+source /etc/bash_completion.d/oc_bash_completion
+
