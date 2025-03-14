@@ -1,0 +1,74 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+archiveSize: 5
+storageConfig:
+  local:
+    path: ./imageset-back-end
+mirror:
+  platform:
+    architectures:
+    - amd64
+###############################################################
+    channels:
+    - name: stable-4.16 # Want to grab specific releases
+      type: ocp
+      minVersion: 4.16.1
+      maxVersion: 4.16.16
+      shortestPath: true
+    channels:
+    - name: stable-4.16 # grab latest
+##############################################################
+    graph: true
+  operators:
+  # if you want all operators
+  # catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
+  # full: True
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
+    packages:
+    - name: advanced-cluster-management
+      channels:
+      - name: release-2.11
+    - name: cincinnati-operator
+      channels:
+      - name: v1 
+    - name: cluster-logging                                    
+      channels:
+      - name: stable-5.9 
+    - name: compliance-operator                                    
+      channels:
+      - name: stable 
+    - name: kubevirt-hyperconverged
+      channels:
+      - name: stable
+    - name: local-storage-operator
+      channels:
+      - name: stable
+    - name: mcg-operator 
+      channels:
+      - name: stable-4.16
+    - name: ocs-client-operator
+      channels: 
+      - name: stable-4.16
+    - name: ocs-operator
+      channels:
+      - name: stable-4.16
+    - name: odf-csi-addons-operator 
+      channels:
+      - name: stable-4.16
+    - name: odf-operator 
+      channels:
+      - name: stable-4.16
+    - name: rhacs-operator 
+      channels:
+      - name: stable 
+    - name: serverless-operator                                     
+      channels:
+      - name: stable 
+
+  additionalImages:
+  - name: registry.redhat.io/ubi8/ubi:latest
+  - name: registry.redhat.io/ubi9/ubi:latest
+  - name: registry.redhat.io/rhel8/support-tools:latest
+  - name: registry.redhat.io/ubi8/nodejs-18:latest
+  - name: registry.redhat.io/ubi8/nodejs-18-minimal:latest
+

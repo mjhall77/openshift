@@ -1,0 +1,42 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: agent-config 
+additionalNTPSources:
+  - 0.north-america.pool.ntp.org
+  - 1.north-america.pool.ntp.org
+rendezvousIP: 192.168.1.80  # For a SNO cluster this is the same IP as the server. For a non-SNO install, pick an IP of one of the control plane servers
+hosts:
+  - hostname: master-0
+    role: master
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a6
+    rootDeviceHints:
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0
+          type: ethernet
+          state: up
+          mac-address: 00:ef:44:21:e6:a6  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: true
+            dhcp: true
+#####
+  - hostname: worker-0
+    role: worker
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a6
+    rootDeviceHints:
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0
+          type: ethernet
+          state: up
+          mac-address: 00:ef:44:21:e6:a6  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: true
+            dhcp: true
