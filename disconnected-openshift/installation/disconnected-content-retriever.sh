@@ -15,7 +15,7 @@ if [ ! -d ${base_dir}/${project_name}/openshift-installation-configs ]; then mkd
 
 ####### should I include pulling the .iso from the depenedices directory for non agent installations ################
 
-cp openshift-helper-tools.tar ${base_dir}/${project_name}/openshift-installation-configs/
+cp openshift-helper-tools.tar ${base_dir}/${project_name}/
 
 printf "Getting ${ocp_version} agents required for disconnected installation \n"
 
@@ -87,187 +87,11 @@ else
 	printf "Already pulled ${base_dir}/${project_name}/mirror-registry/mirror-registry.tar.gz\n"
 fi
 
+## Copy configuration files
+cp installation-config-files/*.yaml ${base_dir}/${project_name}/openshift-installation-configs/
 
-################################################################################################################
-# The following is documentation to include with the disconnected package to be transferred to the remote system
-################################################################################################################
-
-## Example agent-config.yaml 
-cat > ${base_dir}/${project_name}/openshift-installation-configs/template-agent-config.yaml <<'_EOF'
-apiVersion: v1beta1
-kind: AgentConfig
-metadata:
-  name: 
-rendezvousIP: 
-additionalNTPSources:
-  - 
-  - 
-hosts:
-  - hostname: 
-    role: master
-    interfaces:
-      - name: 
-        macAddress: 
-    rootDeviceHints:
-      deviceName: 
-  - hostname: 
-    role: master
-    interfaces:
-      - name: 
-        macAddress: 
-    rootDeviceHints:
-      deviceName: 
-  - hostname: 
-    role: master
-    interfaces:
-      - name: 
-        macAddress: 
-    rootDeviceHints:
-      deviceName: 
-_EOF
-
-## Example install-config.yaml
-cat > ${base_dir}/${project_name}/openshift-installation-configs/template-install-config.yaml <<'_EOF'
-apiVersion: v1
-baseDomain:
-metadata:
-  name:
-networking:
-  clusterNetwork:
-  - cidr: 10.128.0.0/14
-    hostPrefix: 23
-  machineNetwork:
-  - cidr:
-  networkType: OVNKubernetes
-  serviceNetwork:
-  - 172.30.0.0/16
-compute:
-- name: worker
-  replicas: 0
-controlPlane:
-  name: master
-  replicas: 3
-platform:
-  none: {}
-  baremetal: # bare metal example
-    hosts:
-      - name: <Control plan 1>
-        bootMACAddress:
-      - name: <Control plan 2>
-        bootMACAddress:
-      - name: <Contorl plan 3>
-        bootMACAddress:
-    apiVIPs:
-    -
-    ingressVIPs:
-    -
-fips: false
-pullSecret: ' <Pull secret for disconnected registry> '
-sshKey: "ssh-rsa "
-imageDigestSources:   # The following entries can be pulled from imageContentsourcepolicy.yaml produced by oc-mirror
-- mirrors:
-  - <FQDN of regsitry>:<PORT>/openshift/release
-  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-- mirrors:
-  - <FQDN of registry>:<PORT>/openshift/release-images
-  source: quay.io/openshift-release-dev/ocp-release
-additionalTrustBundle: |
-  -----BEGIN CERTIFICATE-----
-  -----END CERTIFICATE-----
-additionalTrustBundlePolicy: Always
-
------------------- bonded with vlan example  ---------------------------------
-  - hostname: master0
-    role: master
-    interfaces:
-     - name: enp0s4
-       macAddress: 00:21:50:90:c0:10
-     - name: enp0s5
-       macAddress: 00:21:50:90:c0:20
-    networkConfig:
-      interfaces:
-        - name: bond0.300
-          type: vlan
-          state: up
-          vlan:
-            base-iface: bond0
-            id: 300
-          ipv4:
-            enabled: true
-            address:
-              - ip: 10.10.10.14
-                prefix-length: 24
-            dhcp: false
-        - name: bond0
-          type: bond
-          state: up
-          mac-address: 00:21:50:90:c0:10
-          ipv4:
-            enabled: false
-          ipv6:
-            enabled: false
-          link-aggregation:
-            mode: active-backup
-            options:
-              miimon: "150"
-            port:
-             - enp0s4
-             - enp0s5
-      dns-resolver:
-        config:
-          server:
-            - 10.10.10.11
-            - 10.10.10.12
-      routes:
-        config:
-          - destination: 0.0.0.0/0
-            next-hop-address: 10.10.10.10
-            next-hop-interface: bond0.300
-            table-id: 254
-
-------------------- static SNO example ---------------------------------
-
-apiVersion: v1beta1
-kind: AgentConfig
-metadata:
-  name: << name oc cluster example: sno-cluster >>
-rendezvousIP: << ip of SNO server example: 192.168.111.80 >>
-additionalNTPSources:
-  - 0.north-america.pool.ntp.org
-  - 1.north-america.pool.ntp.org
-hosts:
-  - hostname: << server name short/fqdn exmaple: master-0 >>
-    interfaces:
-      - name: << interface name example: eno1 >>
-        macAddress: << interface mac example: 00:ef:44:21:e6:a5 >>
-    rootDeviceHints:
-      deviceName: << install drive exmaple: /dev/sdb >>
-    networkConfig:
-      interfaces:
-        - name: << interface name example: eno1 >>
-          type: ethernet
-          state: up
-          mac-address: << interface mac example: 00:ef:44:21:e6:a5 >>
-          ipv4:
-            enabled: true
-            address:
-              - ip: << ip address example: 192.168.111.80 >>
-                prefix-length: << subnet example: 24 >>
-            dhcp: false
-      dns-resolver:
-        config:
-          server:
-            - << dns server example: 192.168.111.1 >>
-            - << dns server2 example: 192.168.111.2 >>
-      routes:
-        config:
-          - destination: 0.0.0.0/0
-            next-hop-address: << default gw example: 192.168.111.2 >>
-            next-hop-interface: << interface name example: eno1 >>
-            table-id: 254
-
-
-_EOF
+## Copy openshift installation documentation
+mkdir -p ${base_dir}/${project_name}/disconnected-docs && cp disconnected-docs/* ${base_dir}/${project_name}/disconnected-docs/
 
 cat > ${base_dir}/${project_name}/mirror-registry/notes.txt <<'_EOF'
 # set up temporary container registry
@@ -355,7 +179,7 @@ while true; do
 		if [ ! -f ${base_dir}${project_name}/imageset-config.yaml ]; then
 			printf "Could not find ${base_dir}${project_name}/imageset-config.yaml, cannot run oc-mirror...  \n"
 		fi
-		cp installation-config-files/imageset-config.yaml-template ${base_dir}${project_name}/oc-mirror-configs/
+		cp ${base_dir}${project_name}/imageset-config.yaml ${base_dir}${project_name}/oc-mirror-configs/
 		cd ${base_dir}${project_name}
 		oc-mirror --config=imageset-config.yaml file://oc-mirror-image-content
 		break;;
@@ -368,5 +192,5 @@ done
 
 printf "\nGenerating tarball of installattion artifacts"
 cd ${base_dir}${project_name}
-tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs 
-rm -rf mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs 
+tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs disconnected-docs openshift-helper-tools.tar
+rm -rf mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs disconnected-docs openshift-helper-tools.tar
