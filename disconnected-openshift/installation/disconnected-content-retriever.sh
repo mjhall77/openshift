@@ -15,7 +15,7 @@ if [ ! -d ${base_dir}/${project_name}/openshift-installation-configs ]; then mkd
 
 ####### should I include pulling the .iso from the depenedices directory for non agent installations ################
 
-cp openshift-helper-tools.tar ${base_dir}/${project_name}/
+cp openshift-helper-tools.tar ${base_dir}/${project_name}/agents_${ocp_version};
 
 printf "Getting ${ocp_version} agents required for disconnected installation \n"
 
@@ -192,5 +192,5 @@ done
 
 printf "\nGenerating tarball of installattion artifacts"
 cd ${base_dir}${project_name}
-tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs disconnected-docs openshift-helper-tools.tar
-rm -rf mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs disconnected-docs openshift-helper-tools.tar
+tar -cvf ${ocp_version}-disconnected-installation-components.tgz mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs disconnected-docs 
+rm -rf mirror-registry agents_${ocp_version} oc-mirror-configs openshift-installation-configs disconnected-docs 
