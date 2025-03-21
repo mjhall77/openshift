@@ -10,7 +10,7 @@ spec:
     - name: eth1.102 
       description: VLAN using eth1 
       type: vlan 
-      state: up 
+      state: up
       vlan:
         base-iface: eth1 
         id: 102 
