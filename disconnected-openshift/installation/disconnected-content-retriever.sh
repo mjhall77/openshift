@@ -21,14 +21,14 @@ printf "Getting ${ocp_version} agents required for disconnected installation \n"
 
 printf "openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
 if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz ]; then
-	curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz
+	curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-amd64-rhel9-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-amd64-rhel9-${ocp_version}.tar.gz
 else
 	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel9-${ocp_version}.tar.gz \n"
 fi
 
 printf "openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
 if [ ! -f ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz ]; then
-	curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz
+	curl -L -o ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-amd64-rhel8-${ocp_version}.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${ocp_version}/openshift-client-linux-amd64-rhel8-${ocp_version}.tar.gz
 else
 	printf "Already pulled ${base_dir}/${project_name}/agents_${ocp_version}/openshift-client-linux-adm64-rhel8-${ocp_version}.tar.gz \n"
 fi
