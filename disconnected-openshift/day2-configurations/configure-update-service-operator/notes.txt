@@ -15,6 +15,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: update-service-ca
+  namespace: openshift-config
 data:
   updateservice-registry: | 
     -----BEGIN CERTIFICATE-----
@@ -40,7 +41,7 @@ spec:
 # releases is typically openshift/release-images
 
 # Configure the Cluster Version Operator
-POLICY_ENGINE_GRAPH_URI="$(oc -n openshift-update-serivce get -o jsonpath='{.status.policyEngineURI}/api/upgrades_info/v1/graph{"\n"}' updateservice cluster-update-service)"
+POLICY_ENGINE_GRAPH_URI="$(oc -n openshift-update-service get -o jsonpath='{.status.policyEngineURI}/api/upgrades_info/v1/graph{"\n"}' updateservice cluster-update-service)"
 PATCH="{\"spec\":{\"upstream\":\"${POLICY_ENGINE_GRAPH_URI}\"}}"
 oc patch clusterversion version -p $PATCH --type merge
 

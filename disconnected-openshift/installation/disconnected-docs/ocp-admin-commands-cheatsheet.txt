@@ -1,0 +1,5 @@
+### Enable bash completion - run as root
+oc completion bash > /etc/bash_completion.d/oc_bash_completion
+source /etc/bash_completion.d/oc_bash_completion
+
+### 
