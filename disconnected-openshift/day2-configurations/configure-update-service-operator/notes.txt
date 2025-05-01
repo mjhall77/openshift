@@ -46,3 +46,6 @@ PATCH="{\"spec\":{\"upstream\":\"${POLICY_ENGINE_GRAPH_URI}\"}}"
 oc patch clusterversion version -p $PATCH --type merge
 
 Administration -> Cluster Settings  is where kick off the update
+
+
+*** NOTE:  if you see a TLS error run the steps in the 
