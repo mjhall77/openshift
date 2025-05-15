@@ -21,7 +21,7 @@ htpasswd -B </path/to/file> <username>
 oc create secret generic htpass-secret --from-file=htpasswd=/path/to/htpasswd -n openshift-config
 
 # Add indentity provider to the cluster by applying htpasswd-config.yaml 
-oc apply -f htpasswd-config.yaml -n openshift-config
+oc apply set-last-applided -f htpasswd-config.yaml 
 
 # Wait for new pods to deploy in openshift-authentication
 oc get po -n openshift-authentication -o wide
