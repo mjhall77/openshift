@@ -1,0 +1,42 @@
+#  Great Reference Doc:  https://myopenshiftblog.com/adding-active-directory-oauth-provider/
+
+# Items needed:
+   - URL to Domain Controller:  
+       example not using tls:  ldap://mydomaincontroller.openshift.example.com:389/DC=openshift,DC=example,DC=come,?sAMAccountName
+       example using tls:  ldaps://mydomaincontroller.openshift.example.com:636/DC=openshift,DC=example,DC=come,?sAMAccountName
+
+   - Bind DN which is typically a service account that has permission to query domain:  
+       example:  ldap_svc@openshift.example.com
+
+   - Bind DN password
+
+   - Certificates for DC if using tls:
+     openssl s_client -connect <ldapservername:636> -showcerts
+     example:  openssl s_client -connect mydomaincontroller.openshift.example.com:636 -showcerts
+
+# Recommend configuration via GUI form  Administration -> Cluster Settings -> Configuration -> Oauth -> Add under Identity Providers
+  - You should be able to log in once configurations have been completed
+    - oc get co
+    - oc get po -n openshift-authentication  <should have short age>
+
+# Troubleshooting steps
+  - Test using the search strings below, you should get results if configuration is correct
+   LDAPTLS_REQCERT=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldap://mydomaincontroller.openshift.example.com:389 -b "OU=users,DC=openshift,DC=example,DC=come,?sAMAccountName"
+   LDAPTLS_REQCERT=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldaps://mydomaincontroller.openshift.example.com:636 -b "OU=users,DC=openshift,DC=example,DC=come,?sAMAccountName"
+
+  -  Review logs of Oauth pods
+     oc logs -l app=auth-openshift
+
+
+# Next steps you will want to configure groups in Openshift and bind the AD groups to them
+  - create group:  oc adm groups new administrators  <you have to add one group at a time>
+  - grant role:  oc policy add-role-to-group cluster-admin administrators   <namespace level access>
+  - grant cluster role:  oc policy add-cluster-role-to-group cluster-admin administrators   <cluster wide access>
+
+# Create ldap sync configuration file
+  - examples in repo
+
+# Run ldap sync file from bastion server
+  oc adm groups sync -sync-config=secure-ldap-groupsync.yaml "CN=OpenshiftAdmins,OU=Groups,DC=openshift,DC=example,DC=com" --confirm
+
+# Verify users in group have access as configured
