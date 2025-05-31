@@ -66,12 +66,34 @@ spec:
 ## If the external registry is secure first log into the external registry
 podman login -u <username> <external-image-registry>
 
-## Create a pull secret for registry if credentials required
+## Create a pull secret for registry if not all namespaces need to pull from the repo
 oc create secret docker-registry <registry-name>-pull-secret --docker-server=<registry:port> --docker-username=<username> --docker-password=<password> -n <namespace>
   - example:  oc create secret docker-registry dev-registry-pull-secret --docker-server=dev-registry.example.com:8443 --docker-username=init --docker-password=password 
 
-## Link secret to builder service account
-oc secrets link builder <registry-name-pull-secret>
-  - example:  oc secretes link builder dev-registry-pull-secret
+    ## Link secret to builder service account
+    oc secrets link builder <registry-name-pull-secret>
+      - example:  oc secretes link builder dev-registry-pull-secret
+
+## Add registry pull secret to the cluster pull secret if all namespaces are allowed to pull from repo
+# Download the pull secret to your local file system. 
+oc extract secret/pull-secret -n openshift-config --to=.
+
+# Add pull secret for external regsitry to the .dockerconfigjson file created from previous command
+oc login -u <username> <registry>
+
+# Get pull secret for external registry
+cat $XDG_RUNTIME_DIR/containers/auth.json
+
+# Add external registry entry to .dockerconfigjson
+## IMPORTANT verify updated .dockerconfigjson is valid using the following process
+podman logout <external-registry>
+podman login --authfile=.dockerconfigjson <external-registry>  # If .dockerconfigjson valid you should get return: Existing credentials are valid. Repeat process for all registries listed in .dockerconfigjson
+
+
+# Update global pull secret 
+oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=.dockerconfigjson
+
+# Note it may take a couple minutes to update cluster with new pull secret.  Run following command waiting for Updated to be true for master, infra and workers
+oc get mcp -w
 
 
