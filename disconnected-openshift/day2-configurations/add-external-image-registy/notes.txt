@@ -1,0 +1,77 @@
+##  Adding an additional external image registry for the cluster to pull from
+## RH docs add additional image registry:  https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/images/image-configuration#images-configuration-allowed_image-configuration
+## RH docs add additional trusted ca: 
+## RH KCS Article:  https://access.redhat.com/solutions/4654511
+
+# Update image.config.openshift.io/cluster to add additional repo
+oc edit image.config.openshift.io/cluster 
+
+# To add an external registry update the spec: section, below is an example image.config.openshift.io/cluster CR
+
+##***** EXTREMELY important When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.******##
+
+apiVersion: config.openshift.io/v1
+kind: Image
+metadata:
+  annotations:
+    release.openshift.io/create-only: "true"
+  creationTimestamp: "2019-05-17T13:44:26Z"
+  generation: 1
+  name: cluster
+  resourceVersion: "8302"
+  selfLink: /apis/config.openshift.io/v1/images/cluster
+  uid: e34555da-78a9-11e9-b92b-06d6c7da38dc
+spec:
+  registrySources: 
+    allowedRegistries: 
+    - example.com
+    - quay.io
+    - registry.redhat.io
+    - reg1.io/myrepo/myapp:latest
+    - image-registry.openshift-image-registry.svc:5000
+status:
+  internalRegistryHostname: image-registry.openshift-image-registry.svc:5000
+
+# The Machine config operator has to update the nodes, wait for this process to complete:
+oc get mcp -w   (looking for UPDATED: True,  UPDATING: False,  DEGRADED: False) NOTE: this could take several minutes, all nodes need to have configuration change applied 
+
+# Validate the configs have been applied
+oc debug node/<node_name>
+chroot /host
+cat /etc/containers/policy.json | jq '.'   # you should see the registries configured in image.config.openshift.io/cluster  spec.registrySources.allowedRegistries
+
+
+# If the registry requires a certificate for accessing, add to the spec.additionalTrustedCA.name configmap if exists otherwise create one. 
+
+## If the cm exists then update data portion for the new external registry
+data:
+  registry.example.com: |
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+  registry-with-port.example.com..5000: | 
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+
+## If need to create use the following command:
+oc create configmap registry-config --from-file=<external_registry_address>=ca.crt -n openshift-config
+   example:   oc create configmap registry-config --from-file=new-external-registry.com..8443=/etc/pki/ca-trust/source/anchors/new-external-registry.pem -n openshift-config
+
+## update image.config.openshift.io/cluster
+spec:
+  additionalTrustedCA:
+    name: registry-config
+
+## If the external registry is secure first log into the external registry
+podman login -u <username> <external-image-registry>
+
+## Create a pull secret for registry if credentials required
+oc create secret docker-registry <registry-name>-pull-secret --docker-server=<registry:port> --docker-username=<username> --docker-password=<password> -n <namespace>
+  - example:  oc create secret docker-registry dev-registry-pull-secret --docker-server=dev-registry.example.com:8443 --docker-username=init --docker-password=password 
+
+## Link secret to builder service account
+oc secrets link builder <registry-name-pull-secret>
+  - example:  oc secretes link builder dev-registry-pull-secret
+
+
