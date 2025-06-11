@@ -33,3 +33,5 @@ sudo podman login -u kubeadmin -p $(oc whoami -t) $HOST
 # To manually edit the image registry
 oc edit configs.imageregistry.operator.openshift.io
 
+# To move the registry to an Infra node:
+oc patch configs.imageregistry.operator.openshift.io/cluster -p '{"spec":{"nodeSelector":{"node-role.kubernetes.io/infra": ""}}}' --type=merge

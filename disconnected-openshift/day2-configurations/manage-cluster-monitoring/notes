@@ -1,0 +1,4 @@
+# By default monitoring pods are deployed on worker nodes.  If you have infra nodes you can deploy the monitoring pods on them
+oc create -f cluster-monitoring-infra-config.yaml -n openshift-monitoring
+
+
