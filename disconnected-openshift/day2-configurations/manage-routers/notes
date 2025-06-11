@@ -1,0 +1,10 @@
+# Individual router deployments are managed via ingresscontrollers/default (the default IngressController). There is a default one created in the openshift-ingress-operator namespace:
+oc get ingresscontrollers.operator.openshift.io -o yaml -n openshift-ingress-operator 
+
+# To specify a nodeSelector that tells the router pods to hit the infrastructure nodes, we can apply the following configuration:
+oc apply -f move-ingress-routers-to-infra.yaml
+
+# To add an additional ingress router to the cluster, chnage the replicas value in ingresscontrollers.operator.openshift.io:
+oc edit ingresscontrollers.operator.openshift.io -o yaml -n openshift-ingress-operator
+
+NOTE:  Changing ingress routers, you may need to make configuration changes to point to infra nodes opposed to worker nodes in lb
