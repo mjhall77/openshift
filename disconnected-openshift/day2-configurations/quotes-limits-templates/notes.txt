@@ -1,0 +1,38 @@
+# Out of the box, OpenShift does not restrict the quantity of objects or amount of resources (eg: CPU, memory) that they can consume within a Project. Further, users may create an unlimited number of Projects. 
+
+# View the built in defualt project template: 
+oc adm create-bootstrap-project-template -o yaml
+
+# Templates are a powerful tool that enable the user to easily create reusable sets of OpenShift objects with powerful parameterization. 
+# While the quota sets an upper bound on the total resource consumption within a project, the LimitRange generally applies to individual resources. For example, setting how much CPU an individual Pod or container can use.
+# Remember that quotas and limits are applied at the Project level. Users may have access to multiple Projects, but quotas and limits do not apply directly to Users. 
+# If you want to apply one quota across multiple Projects, then you should look at the multi-project quota documentation
+
+# To create a project template that you want to use cluster wide:
+oc create -f project_quota_ranges_template.yaml -n openshift-config
+
+# The default projectRequestTemplate is part of the OpenShift API Server configuration. This configuration is ultimately stored in a ConfigMap in the openshift-apiserver project
+oc get cm config -n openshift-apiserver
+
+# To add the project-request template apply the following:
+oc apply -f cr_project_request.yaml
+
+# It will take some time to update openshift api server configurations:
+oc rollout status deploy apiserver -n openshift-apiserver
+
+# To verify confirgation has been implemented, see projectRequestTemplate section:
+oc get cm config -n openshift-apiserver -o jsonpath --template="{.data.config\.yaml}" | jq
+
+# To test create a test project
+oc new-project template-test
+
+# Verify quotas are set
+oc describe project template-test
+
+oc get quota 
+
+oc describe quota template-test-quota
+
+oc get limitranges
+
+oc describe limitranges template-test-limits
