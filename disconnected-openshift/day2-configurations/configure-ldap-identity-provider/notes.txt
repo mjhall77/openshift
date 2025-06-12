@@ -40,3 +40,17 @@
   oc adm groups sync -sync-config=secure-ldap-groupsync.yaml "CN=OpenshiftAdmins,OU=Groups,DC=openshift,DC=example,DC=com" --confirm
 
 # Verify users in group have access as configured
+
+
+------------------ Disable self-provisioner ---------------------------
+# OpenShift, by default, allows authenticated users to create Projects to logically house their applications.
+# By default all users belong to group system:authenticated:oauth
+# View self-provisioners role
+oc describe clusterrolebinding.rbac self-provisioners
+
+# To remove system:authenticated:oauth from the role binding
+oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
+
+# Automatic updates reset the cluster roles to a default state. In order to disable this, you need to set the annotation
+oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kuberetes.io/autoupdate": "false" } } }'
+

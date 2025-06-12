@@ -43,6 +43,18 @@ oc create secret generic htpass-secret --from-file=htpasswd --dry-run -o yaml -n
 # Check identity
 oc get identity
 
+------------------ Disable self-provisioner ---------------------------
+# OpenShift, by default, allows authenticated users to create Projects to logically house their applications.
+# By default all users belong to group system:authenticated:oauth
+# View self-provisioners role
+oc describe clusterrolebinding.rbac self-provisioners
+
+# To remove system:authenticated:oauth from the role binding
+oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
+
+# Automatic updates reset the cluster roles to a default state. In order to disable this, you need to set the annotation
+oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kuberetes.io/autoupdate": "false" } } }'
+
 ------------------ Accounts Management ---------------------------
 
 # The following steps will disable project self-provisioning
@@ -74,3 +86,4 @@ oc adm policy add-cluster-role-to-group <cluster role> <group>       # add clust
    oc auth can-i <verb> <resource>    # see if account has permission to do verb on resource
 
    oc adm policy who-can <verb> <resource>   # determine which users can do verb on resource
+
