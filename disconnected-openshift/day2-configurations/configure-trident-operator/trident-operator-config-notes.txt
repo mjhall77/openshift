@@ -1,0 +1,55 @@
+Create an SVM (Storage Virtual Machine) on NetApp storage system
+
+Configure Protocols:  Enable NFS on the SVM
+
+Set up Access Rules:  Create export policy
+
+Create LIFs (Logical Interfaces) on the SVM to provide network connectivity for NFS
+
+BLOG Article:  https://www.redhat.com/en/blog/configure-a-netapp-svm-to-expose-nfs-for-openshift-virtualization
+
+
+### Create secret #########
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-tbc-ontap-nas-secret
+type: Opaque
+stringData:
+  username: admin
+  password: 
+
+#### Configure Trident Backend ######
+
+apiVersion: trident.netapp.io/v1
+kind: TridentBackendConfig
+metadata:
+  name: ontap-nas-example
+spec:
+  version: 1
+  storageDriverName: ontap-nas
+  managementLIF: 10.0.0.1  # Replace with your management LIF
+  dataLIF: 10.0.0.2       # Replace with your data LIF
+  svm: vs1                # Replace with your SVM name
+  credentials:
+    name: ontap-nas-secret
+  nfs:
+    exportPolicy: my-export-policy
+    securityTypes:
+      - sys
+    clients:
+      - 192.168.0.0/16
+
+###  Create storage class #####
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ontap-nfs-gold
+provisioner: csi.trident.netapp.io
+parameters:
+  backendName: ontap-nas-example  # Must match the backend name
+  storageProtocol: nfs
+  # Optionally configure volumeLifecycle and storageClassName
+  # volumeLifecycle: transient
+  # storageClassName: ontap-nfs-gold
