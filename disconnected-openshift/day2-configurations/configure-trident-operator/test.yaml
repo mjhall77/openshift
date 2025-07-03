@@ -1,0 +1,18 @@
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: test-project
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: test-pvc
+ namespace: test-project
+spec:
+ accessModes:
+ - ReadWriteMany
+ resources:
+   requests:
+     storage: 13Gi
+ storageClassName: ontap-nas-gold

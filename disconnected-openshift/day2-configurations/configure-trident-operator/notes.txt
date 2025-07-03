@@ -1,0 +1,30 @@
+# The following tasks need to be configured on the Netapp for NFS
+ - Create an SVM (Storage Virtual Machine) on NetApp storage system
+ - Configure Protocols:  Enable NFS on the SVM
+ - Set up Access Rules:  Create export policy
+ - Create LIFs (Logical Interfaces) on the SVM to provide network connectivity for NFS
+ 
+# resources
+Red Hat Blog:  https://www.redhat.com/en/blog/configure-a-netapp-svm-to-expose-nfs-for-openshift-virtualization
+Netapp demos / videos:  https://docs.netapp.com/us-en/netapp-solutions/containers/rh-os-n_videos_and_demos.html
+Netapp docs: https://docs.netapp.com/us-en/hci-solutions/anthos_task_install_and_configure_trident.html
+Red Hat Blog:  https://www.redhat.com/en/blog/configure-a-netapp-svm-to-expose-nfs-for-openshift-virtualization
+Install tridentctl:  https://docs.netapp.com/us-en/trident/trident-get-started/kubernetes-deploy-tridentctl.html#step-1-download-the-trident-installer-package
+Trident Parameters:  https://docs.netapp.com/us-en/trident/trident-reference/objects.html#kubernetes-storageclass-objects
+Triedent Backend options:  https://docs.netapp.com/us-en/trident/trident-use/ontap-san-examples.html#backend-configuration-options"
+Trident gitrepo:  "https://github.com/NetApp/trident-install  
+
+# Deployment steps
+
+1. Deploy Trident Certified Operator
+
+2. Create Trident Orchestrator
+
+3. Update and apply trident-backend-secret.yaml
+
+4. Update and apply trident-backend-config.yaml
+
+5. Update and apply trident-gold-sc.yaml
+
+6. apply test-pvc.yaml (verify pvc bonded and volume appears in aggergate)
+

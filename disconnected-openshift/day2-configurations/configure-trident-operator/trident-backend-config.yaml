@@ -1,0 +1,14 @@
+apiVersion: trident.netapp.io/v1
+kind: TridentBackendConfig
+metadata:
+  name: ontap-nas-backend
+spec:
+  version: 1
+  storageDriverName: ontap-nas
+  managementLIF: 10.0.0.1  # Replace with your management LIF
+  dataLIF: 10.0.0.2       # Replace with your data LIF
+  svm: vs1                # Replace with your SVM name
+  aggregate: agg_name     # Replace with the aggregate you want volumes to be created on
+  credentials:
+    name: trident-backend-secret
+  mountOptions: ["nfsvers=3", "proto=tcp"]   # Set the NFS version
