@@ -1,0 +1,20 @@
+Remove a node: https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/nodes/working-with-nodes#nodes-nodes-working-deleting-bare-metal_nodes-nodes-working
+
+
+
+Remove a Node:
+  oc adm cordon <node_name>
+  oc adm drain <node_name> --force=true --delete-emptydir-data=true --ignore-daemonsets=true
+  oc delete node <node_name>
+
+Add a Node:
+  mkdir add-node && cd add-node
+  NOTE: OCP 4.17 you will need to extract openshift-installer
+    - oc adm release extract --command=openshift-install 4.18.17 --to .
+  NOTE: OCP 4.17 might need to extract base coreOS image
+    - openshift-install coreos print-stream-json > stream.json
+    - oci_image_url=$(jq -r '.architectures.x86_64.artifacts.oci.image.location' stream.json)
+    - url -O "$oci_image_url"
+  cp /path/to/nodes-config.yaml .
+  oc adm node-image create
+
