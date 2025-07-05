@@ -1,0 +1,21 @@
+Download the current version of Vsphere VDDK: https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest
+
+MTV:  https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.6/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#creating-vddk-image_mtv
+
+Directions:
+
+mkdir /tmp/vddk-build && cd /tmp/vddk-build
+
+tar -xzf /full/path/VMware-vix-disklib-<version>.x86_64.tar.gz --directory /tmp/vddk-build
+
+cat > Dockerfile <<EOF
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+USER 1001
+COPY vmware-vix-disklib-distrib /vmware-vix-disklib-distrib
+RUN mkdir -p /opt
+ENTRYPOINT ["cp", "-r", "/vmware-vix-disklib-distrib", "/opt"]
+EOF
+
+podman build . -t <registry_route_or_server_path>/vddk:<tag>
+
+podman push <registry_route_or_server_path>/vddk:<tag>
