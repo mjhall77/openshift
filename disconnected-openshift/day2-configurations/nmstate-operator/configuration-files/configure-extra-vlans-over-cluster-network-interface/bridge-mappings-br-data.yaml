@@ -1,0 +1,67 @@
+---
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vlan1034-br-data-mapping                    # VLAN plus bridge mapping
+spec:
+  desiredState:
+    ovn:
+      bridge-mappings:
+      - bridge: br-data                             # must match bridge that you created in new bridge yaml
+        localnet: vlan1034-br-data-mapping          # Must match name above under metadata
+        state: present                              # Present to have mapping available.... Change to absent if you are removing mapping, must do this before oc delete nncp
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""              # If you want to configure on all worker nodes in the cluster
+    #kubernetes.io/hostname: ocp-worker01           # If you want to configure on 1 or more hosts
+    kubernetes.io/hostname:            # If you want to configure on 1 or more hosts
+
+---
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vlan1035-br-data-mapping                    # VLAN plus bridge mapping
+spec:
+  desiredState:
+    ovn:
+      bridge-mappings:
+      - bridge: br-data                             # must match bridge that you created in new bridge yaml
+        localnet: vlan1035-br-data-mapping          # Must match name above under metadata
+        state: present                              # Present to have mapping available.... Change to absent if you are removing mapping, must do this before oc delete nncp
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""              # If you want to configure on all worker nodes in the cluster
+    #kubernetes.io/hostname: ocp-worker01           # If you want to configure on 1 or more hosts
+    kubernetes.io/hostname:            # If you want to configure on 1 or more hosts
+
+---
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vlan1036-br-data-mapping                    # VLAN plus bridge mapping
+spec:
+  desiredState:
+    ovn:
+      bridge-mappings:
+      - bridge: br-data                             # must match bridge that you created in new bridge yaml
+        localnet: vlan1036-br-data-mapping          # Must match name above under metadata
+        state: present                              # Present to have mapping available.... Change to absent if you are removing mapping, must do this before oc delete nncp
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""              # If you want to configure on all worker nodes in the cluster
+    #kubernetes.io/hostname: ocp-worker01           # If you want to configure on 1 or more hosts
+    kubernetes.io/hostname:            # If you want to configure on 1 or more hosts
+
+---
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vlan1037-br-data-mapping                    # VLAN plus bridge mapping
+spec:
+  desiredState:
+    ovn:
+      bridge-mappings:
+      - bridge: br-data                             # must match bridge that you created in new bridge yaml
+        localnet: vlan1037-br-data-mapping          # Must match name above under metadata
+        state: present                              # Present to have mapping available.... Change to absent if you are removing mapping, must do this before oc delete nncp
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""              # If you want to configure on all worker nodes in the cluster
+    #kubernetes.io/hostname: ocp-worker01           # If you want to configure on 1 or more hosts
+    kubernetes.io/hostname:        # If you want to configure on 1 or more hosts

@@ -1,0 +1,20 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br-data-interface-eno1                                    # Bridge with interface name suggested but you can name anything
+spec:
+  desiredState:
+    interfaces:
+    - bridge:
+        allow-extra-patch-ports: true                             # keep true
+        options:
+          stp: false                                              # keep default unless need to change
+        port:
+        - name: eno1                                              # Must be name of interface configured in agent-config.yaml
+      description: A dedicated OVS bridge with eno1 as a port     # optional but put something that makes sense to you
+      name: br-data                                               # name can be anything you want -> this will be the name in the bridge mapping configuration
+      state: up                                                   # up means configuration will be/is implemented..  absent is how you remove config from nodes.  set to absent before deleting NNCP
+      type: ovs-bridge                                            # bridge type, keep ovs-bridge
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""                            # Selector example if you want to apply to node type
+    #kubernetes.io/hostname: ocp-worker01                         # Selector example if you want to applpy to a single node..  

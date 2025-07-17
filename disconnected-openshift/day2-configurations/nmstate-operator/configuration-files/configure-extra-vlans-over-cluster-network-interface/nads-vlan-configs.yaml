@@ -1,0 +1,100 @@
+###################################################################################################
+#
+#  config key
+#
+#  config: |-
+#    {
+#      "cniVersion": "0.3.1",                                                # Do not change 
+#      "name": "vlan1032-br-data-mapping",                                   # Match name configured in bridge mapping yaml
+#      "topology": "localnet",                                               # Keep localnet
+#      "netAttachDefName": "default/vlan1032-database-network",              # Namespace/name configured in metadata section for config
+#      "type": "ovn-k8s-cni-overlay",                                        # Keep ovn-k8s-cni-overlay
+#      "vlanID": 1032                                                        # VLAN ID, remove if no vlan needed
+#    }
+#
+###################################################################################################
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan1034-bridge-mapping                                  # Meaningful name for the mapping exmple: vlan1034-database-network
+  namespace: default                                             # place NAD in default namespace makes it available clusterwide, change namespace to make it namespace bound
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlan1034-br-data-mapping",
+      "topology": "localnet",
+      "netAttachDefName": "default/vlan1034-bridge-mapping",
+      "type": "ovn-k8s-cni-overlay",
+      "vlanID": 1034
+    }
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan1035-bridge-mapping                                  # Meaningful name for the mapping exmple: vlan1035-database-network
+  namespace: default                                             # place NAD in default namespace makes it available clusterwide, change namespace to make it namespace bound
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlan1035-br-data-mapping",
+      "topology": "localnet",
+      "netAttachDefName": "default/vlan1035-bridge-mapping",
+      "type": "ovn-k8s-cni-overlay",
+      "vlanID": 1035
+    }
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan1036-bridge-mapping                                  # Meaningful name for the mapping exmple: vlan1036-database-network
+  namespace: default                                             # place NAD in default namespace makes it available clusterwide, change namespace to make it namespace bound
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlan1036-br-data-mapping",
+      "topology": "localnet",
+      "netAttachDefName": "default/vlan1036-bridge-mapping",
+      "type": "ovn-k8s-cni-overlay",
+      "vlanID": 1036
+    }
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan1037-bridge-mapping                                # Meaningful name for the mapping exmple: vlan1037-database-network
+  namespace: default                                             # place NAD in default namespace makes it available clusterwide, change namespace to make it namespace bound
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlan1037-br-data-mapping",
+      "topology": "localnet",
+      "netAttachDefName": "default/vlan1037-bridge-mapping",
+      "type": "ovn-k8s-cni-overlay",
+      "vlanID": 1037
+    }
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan1038-bridge-mapping                                # Meaningful name for the mapping exmple: vlan1038-database-network
+  namespace: default                                             # place NAD in default namespace makes it available clusterwide, change namespace to make it namespace bound
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlan1038-br-data-mapping",
+      "topology": "localnet",
+      "netAttachDefName": "default/vlan1038-bridge-mapping",
+      "type": "ovn-k8s-cni-overlay",
+      "vlanID": 1038
+    }

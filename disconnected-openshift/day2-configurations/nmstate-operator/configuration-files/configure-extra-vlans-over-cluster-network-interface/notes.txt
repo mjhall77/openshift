@@ -1,0 +1,8 @@
+# To add additional VLANs to the host network interface run the following in order...  run one at a time as it will take time to configure
+
+   - oc create -f new-bridge-br-data.yaml
+   - oc create -f bridge-mappings-br-data.yaml
+   - oc create -f nads-vlan-configs.yaml
+
+# If you want to restrict traffic to only the confgured NAD you need to configure Network policies. 
+  - Networking -> Network Policies -> Create Policy -> half way down there is a policy type Deny all egress traffic
