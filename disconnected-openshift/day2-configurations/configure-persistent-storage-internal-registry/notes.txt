@@ -35,3 +35,25 @@ oc edit configs.imageregistry.operator.openshift.io
 
 # To move the registry to an Infra node:
 oc patch configs.imageregistry.operator.openshift.io/cluster -p '{"spec":{"nodeSelector":{"node-role.kubernetes.io/infra": ""}}}' --type=merge
+
+
+************** To remove pvc from image-regsitry **********************
+# For a production cluster you typically would not remove persistent storage.  This is more for a developement environment and testing write capabilites of storage
+
+# Edit the image registry to remove reference to pvc
+oc edit configs.imageregistry.operator.openshift.io
+
+change:   storage:
+            managementState: Unmanaged
+            pvc:
+              claim: registry-storage-pvc
+
+to:       storage: {}
+
+# Configure managementState
+change    managementState: Managed
+
+to:       managementState: Removed
+
+# Remove PVC claim for registry
+oc delete pvc registry-storage-pvc -n openshift-image-registry
