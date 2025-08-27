@@ -29,7 +29,6 @@
 
 
 # Next steps you will want to configure groups in Openshift and bind the AD groups to them
-  - create group:  oc adm groups new administrators  <you have to add one group at a time>
   - grant role:  oc policy add-role-to-group cluster-admin administrators   <namespace level access>
   - grant cluster role:  oc adm policy add-cluster-role-to-group cluster-admin administrators   <cluster wide access>
 
