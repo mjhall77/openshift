@@ -40,6 +40,9 @@ $ oc patch complianceremediations rhcos4-e8-worker-sysctl-kernel-dmesg-restrict 
 # To apply multiple remediaitons you will need to pause the MachineConfigPool -> Do not forget to unpause
 $ oc patch machineconfigpools worker -p '{"spec":{"paused":true}}' --type=merge
 
+# To rescan the cluster run the following
+oc annotate -n openshift-compliance compliancescans/ocp4-stig-v2r1 compliance.openshift.io/rescan=
+
 ------------------------ pull the reports -------------------------
 
 # To retrieve the scan results.  Define and spawn a pod that mounts the PVC and sleeps, 
