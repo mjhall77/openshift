@@ -1,0 +1,5 @@
+Run the following to central and central-mtls to patch rate-limit-connections 
+
+oc patch routes/central-mtls --type='json' --patch='{"metadata":{"annotations":{"haproxy.router.openshift.io/rate-limit-connections":"true"}}}' --type=merge -n rhacs-operator
+
+oc patch routes/central --type='json' --patch='{"metadata":{"annotations":{"haproxy.router.openshift.io/rate-limit-connections":"true"}}}' --type=merge -n rhacs-operator
