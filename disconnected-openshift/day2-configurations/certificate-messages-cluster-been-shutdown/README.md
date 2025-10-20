@@ -22,12 +22,12 @@ oc get csr -o name | xargs oc adm certificate approve
 
 - You may have to wait a couple minutes and run the get csr and certificate approve commands a couple of times..
 
-- To verify the cluster is up run the following commands
+- To get the status of the cluster run the following commands, you may require more steps depending on the results
 
 ```console
-oc get nodes   - they should return to ready
+oc get nodes  
 
-oc get co      - Each operator should return to Available True with Progressing and Degraded False
+oc get co    
 
 ```
 
