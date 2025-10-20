@@ -8,8 +8,8 @@
 - You will need the following data for configuration
 
    - URL to Domain Controller:
-       - example not using tls:  ldap://mydomaincontroller.openshift.example.com:389/DC=openshift,DC=example,DC=come,?sAMAccountName
-       - example using tls:  ldaps://mydomaincontroller.openshift.example.com:636/DC=openshift,DC=example,DC=come,?sAMAccountName
+       - ** example not using tls: ** ldap://mydomaincontroller.openshift.example.com:389/DC=openshift,DC=example,DC=come,?sAMAccountName
+       - ** example using tls: ** ldaps://mydomaincontroller.openshift.example.com:636/DC=openshift,DC=example,DC=come,?sAMAccountName
 
    - Bind DN which is typically a service account that has permission to query domain:
        - example:  ldap_svc@openshift.example.com
