@@ -8,8 +8,8 @@
 - You will need the following data for configuration
 
    - URL to Domain Controller:
-       - ** example not using tls: ** ldap://mydomaincontroller.openshift.example.com:389/DC=openshift,DC=example,DC=come,?sAMAccountName
-       - ** example using tls: ** ldaps://mydomaincontroller.openshift.example.com:636/DC=openshift,DC=example,DC=come,?sAMAccountName
+       - **example not using tls:** ldap://mydomaincontroller.openshift.example.com:389/DC=openshift,DC=example,DC=come,?sAMAccountName
+       - **example using tls:** ldaps://mydomaincontroller.openshift.example.com:636/DC=openshift,DC=example,DC=come,?sAMAccountName
 
    - Bind DN which is typically a service account that has permission to query domain:
        - example:  ldap_svc@openshift.example.com
@@ -17,10 +17,9 @@
    - Bind DN password
 
    - Certificates for DC if using tls:
-     - openssl s_client -connect <ldapservername:636> -showcerts
      - example:  openssl s_client -connect mydomaincontroller.openshift.example.com:636 -showcerts
 
-- Recommend configuration via GUI form:  Administration -> Cluster Settings -> Configuration -> Oauth -> Add under Identity Providers
+- Recommend configuration via GUI form: **Administration -> Cluster Settings -> Configuration -> Oauth -> Add under Identity Providers**
 
 ```console
 sudo bash
