@@ -1,4 +1,4 @@
-# LDAP Group Sync 
+# LDAP authentication
 
 - OCP works with many authentication providers such as Github, Gitlab, HTPASSWD, Google, OpenID, as well as LDAP. Active Directory is based on LDAP so it will be used to allow users to login to the OCP cluster.
 - This configuration in an example of adding LDAP as an Oauth provider, syncing AD groups and assiging roles (permissions) that each of these groups will have.
@@ -21,13 +21,16 @@
 
 - Recommend configuration via GUI form: **Administration -> Cluster Settings -> Configuration -> Oauth -> Add under Identity Providers**
 
-- It will take a couple of minutes for the authentication cluster opertator to update, to track status run the following and wait for Progressing to be True
+- It will take a couple of minutes for the authentication cluster operator to update, to track status run the following and wait for the *Authentication* operator Available True and Progressing False
 
 ```console
 oc get co
 ```
 
 - Once complete log out of the console, then go back to the console and you should see ldap provider as an option for authentication
+
+
+# Troubleshooting
 
 - If AD users are not able to authenticate to the cluster, here are a couple of troubleshooting steps to try:
 
