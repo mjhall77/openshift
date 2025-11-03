@@ -21,38 +21,35 @@
 
 - Recommend configuration via GUI form: **Administration -> Cluster Settings -> Configuration -> Oauth -> Add under Identity Providers**
 
+- It will take a couple of minutes for the authentication cluster opertator to update, to track status run the following and wait for Progressing to be True
+
 ```console
-sudo bash
-
-export KUBECONFIG=/etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/node-kubeconfigs/lb-int.kubeconfig
-
-oc get csr | grep -i pending
+oc get co
 ```
 
-- The command above lists pending CSR that must be approved for the cluster to trust them
+- Once complete log out of the console, then go back to the console and you should see ldap provider as an option for authentication
+
+- If AD users are not able to authenticate to the cluster, here are a couple of troubleshooting steps to try:
+
+- Test using the search strings below, you should get results if configuration is correct
 
 ```console
-oc get csr -o name | xargs oc adm certificate approve
+LDAP_REQ=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldap://mydomaincontroller.openshift.example.com:389 -b "OU=users,DC=openshift,DC=example,DC=come,?sAMAccountName"
 
+LDAPTLS_REQ=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldaps://mydomaincontroller.openshift.example.com:636 -b "OU=users,DC=openshift,DC=example,DC=come,?sAMAccountName"
 ```
 
-- You may have to wait a couple minutes and run the get csr and certificate approve commands a couple of times..
+- Additional troubleshooting might be required, look at the logs for the oauth pods for errors
 
-- To get the status of the cluster run the following commands, you may require more steps depending on the results
+```console
+oc logs -l app=oauth-openshift -n openshift-authentication
+```
+
+- If users can successfully authenticate via LDAP, next step is to configure LDAP group sync.  It synchronizes user groups from an external LDAP directory into OpenShift, allowing administrators to manage permissions and access for groups defined in a central location
 
 ```console
 
-  - You should be able to log in once configurations have been completed
-    - oc get co
-    - oc get po -n openshift-authentication  <should have short age>
 
-# Troubleshooting steps
-  - Test using the search strings below, you should get results if configuration is correct
-   LDAPTLS_REQCERT=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldap://mydomaincontroller.openshift.example.com:389 -b "OU=users,DC=openshift,DC=example,DC=come,?sAMAccountName"
-   LDAPTLS_REQCERT=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldaps://mydomaincontroller.openshift.example.com:636 -b "OU=users,DC=openshift,DC=example,DC=come,?sAMAccountName"
-
-  -  Review logs of Oauth pods
-     oc logs -l app=auth-openshift
 
 
 # Next steps you will want to configure groups in Openshift and bind the AD groups to them
