@@ -45,6 +45,7 @@ htpasswd -B </path/to/file> <username>
 - To update secret with updated htpasswd file
 oc create secret generic htpass-secret --from-file=htpasswd --dry-run -o yaml -n openshift-config | oc replace -f -
 
+# Group Users
 - To create groups for users in an htpasswd file
   - oc adm groups new <groupname> user1 user2
     - example: oc adm groups new developers developer1 developer2
