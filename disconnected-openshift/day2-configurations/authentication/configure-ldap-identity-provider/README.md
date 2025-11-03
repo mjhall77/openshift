@@ -48,12 +48,33 @@ LDAPTLS_REQ=never ldapsearch -x -D ldap_svc@openshift.example.com -W -H ldaps://
 oc logs -l app=oauth-openshift -n openshift-authentication
 ```
 
-- If users can successfully authenticate via LDAP, next step is to configure LDAP group sync.  It synchronizes user groups from an external LDAP directory into OpenShift, allowing administrators to manage permissions and access for groups defined in a central location
+# LDAP Group Sync - Configure Cronjob
+
+- Once users can successfully authenticate via LDAP, next step is to configure LDAP group sync. It synchronizes user groups from an external LDAP directory into OpenShift, allowing administrators to manage permissions and access for groups defined in a central location
+
+- You will need to create the following CRs: Namespace, Service Account, Cluster Role, Cluster Role Binding, Sync Config Map, Whitelist Config Map of Groups, CronJob
+
+- Samples of these are located the repo
+
+- Update the ldap-sync-service-account.yaml then apply it
 
 ```console
+oc new-project ldap-sync
 
+oc apply -f ldap-sync-service-account.yaml
+```
 
+- Create the Ldap Group Sync role
 
+```console
+oc apply -f ldap-sync-cluster-role.yaml
+```
+
+- Create the Cluster Role Binding *Note if you change the serivce account name you will need to update the ldap-sync-cluster-role-binding.yaml config*
+
+```console
+oc apply -f ldap-sync-cluster-role-binding.yaml
+```
 
 # Next steps you will want to configure groups in Openshift and bind the AD groups to them
   - grant role:  oc policy add-role-to-group cluster-admin administrators   <namespace level access>
