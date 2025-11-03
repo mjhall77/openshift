@@ -1,0 +1,31 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ldap-group-syncer
+  namespace: openshift-authentication
+  labels:
+    app: cronjob-ldap-group-sync
+data:
+  ldap-group-sync.yaml: |
+    kind: LDAPSyncConfig
+    apiVersion: v1
+    url: ldaps://mydomaincontroller.openshift.example.com:636
+    bindDN: ldap_svc@openshift.example.com
+    bindPassword: '********'
+    insecure: false
+    groupUIDNameMapping:
+      "CN=OpenshiftAdmins,OU=Groups,DC=openshift,DC=example,DC=com": administrators
+    augmentedActiveDirectory:
+        groupsQuery:
+            derefAliases: never
+            pageSize: 0
+        groupUIDAttribute: dn
+        groupNameAttributes: [ cn ]
+        usersQuery:
+            baseDN: "DC=openshift,DC=example,DC=com"
+            scope: sub
+            derefAliases: never
+            filter: (objectclass=person)
+            pageSize: 0
+        userNameAttributes: [ sAMAccountName ]
+        groupMembershipAttributes: [ "memberOf:1.2.840.113556.1.4.1941:" ]

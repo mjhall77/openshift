@@ -70,34 +70,40 @@ oc apply -f ldap-sync-service-account.yaml
 oc apply -f ldap-sync-cluster-role.yaml
 ```
 
-- Create the Cluster Role Binding *Note if you change the serivce account name you will need to update the ldap-sync-cluster-role-binding.yaml config*
+- Create the Cluster Role Binding **Note if you change the serivce account name you will need to update the ldap-sync-cluster-role-binding.yaml config**
 
 ```console
 oc apply -f ldap-sync-cluster-role-binding.yaml
 ```
 
-# Next steps you will want to configure groups in Openshift and bind the AD groups to them
-  - grant role:  oc policy add-role-to-group cluster-admin administrators   <namespace level access>
-  - grant cluster role:  oc adm policy add-cluster-role-to-group cluster-admin administrators   <cluster wide access>
+- Create the config map for either secure or unsecure connection. To sync specific groups you will need to update the groupUIDNameMapping section of the cm
 
-# Create ldap sync configuration file
-  - examples in repo
+```console
+oc apply -f cm-secure-ldap-groupsync.yaml
+```
 
-# Run ldap sync file from bastion server
-  oc adm groups sync -sync-config=secure-ldap-groupsync.yaml "CN=OpenshiftAdmins,OU=Groups,DC=openshift,DC=example,DC=com" --confirm
+- Create a group-list cm for mapping groups
 
-# Verify users in group have access as configured
+```console
+oc apply -f ldap-sync-grouplist.yaml
+```
 
+- Create the cronjob that will sync LDAP groups with Openshift Groups
 
------------------- Disable self-provisioner ---------------------------
-# OpenShift, by default, allows authenticated users to create Projects to logically house their applications.
-# By default all users belong to group system:authenticated:oauth
-# View self-provisioners role
-oc describe clusterrolebinding.rbac self-provisioners
+```console
+oc apply -f ldap-sync-cron-job.yaml
+```
 
-# To remove system:authenticated:oauth from the role binding
-oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
+- Once groups are populated with users you will need to configure permissions 
+  - **grant role to group at a namspace level:**  oc policy add-role-to-group <cluster-role> <group> -n <namespace>
+     - exmaple: oc policy add-role-to-group cluster-admin project1-admin -n project1
+  - **grant cluster role to group cluster wide:**  oc adm policy add-cluster-role-to-group <cluster-role> <group>
+     - example: oc policy add-cluster-role-to-group cluster-admin administrators
+     - example: oc policy add-cluster-role-to-group view security-team
 
-# Automatic updates reset the cluster roles to a default state. In order to disable this, you need to set the annotation
+- **Optionally** you can remove self-provisioner.  OpenShift, by default, allows authenticated users to create Projects to logically house their applications. By default all users belong to group system:authenticated:oauth
+- In order to disable this, you need to set the annotation
+
+```console
 oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kuberetes.io/autoupdate": "false" } } }'
 ```
