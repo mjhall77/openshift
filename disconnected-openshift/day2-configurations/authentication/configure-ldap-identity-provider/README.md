@@ -96,10 +96,10 @@ oc apply -f ldap-sync-cron-job.yaml
 
 - Once groups are populated with users you will need to configure permissions 
   - **grant role to group at a namspace level:**  oc policy add-role-to-group <cluster-role> <group> -n <namespace>
-     - exmaple: oc policy add-role-to-group cluster-admin project1-admin -n project1
+     - exmaple: oc adm policy add-role-to-group cluster-admin project1-admin -n project1
   - **grant cluster role to group cluster wide:**  oc adm policy add-cluster-role-to-group <cluster-role> <group>
-     - example: oc policy add-cluster-role-to-group cluster-admin administrators
-     - example: oc policy add-cluster-role-to-group view security-team
+     - example: oc adm policy add-cluster-role-to-group cluster-admin administrators
+     - example: oc adm policy add-cluster-role-to-group view security-team
 
 - **Optionally** you can remove self-provisioner.  OpenShift, by default, allows authenticated users to create Projects to logically house their applications. By default all users belong to group system:authenticated:oauth
 - In order to disable this, you need to set the annotation

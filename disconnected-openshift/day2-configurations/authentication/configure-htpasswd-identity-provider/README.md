@@ -51,7 +51,7 @@ oc create secret generic htpass-secret --from-file=htpasswd --dry-run -o yaml -n
     - example: oc adm groups new developers developer1 developer2
 
 - Grant persmission to user or group
-  - oc policy add-role-to-user view <role > <username> -n <project>    # add cluster role to user in namespace - not cluster wide
+  - oc adm policy add-role-to-user view <role > <username> -n <project>    # add cluster role to user in namespace - not cluster wide
 
   - oc adm policy add-cluster-role-to-user <cluster role> <user>       # add cluster role to user - cluster wide
 

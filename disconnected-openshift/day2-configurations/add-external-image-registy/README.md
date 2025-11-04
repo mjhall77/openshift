@@ -1,10 +1,14 @@
-##  Adding an additional external image registry for the cluster to pull from
-## RH docs add additional image registry:  https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/images/image-configuration#images-configuration-allowed_image-configuration
-## RH docs add additional trusted ca: 
-## RH KCS Article:  https://access.redhat.com/solutions/4654511
+# Add Additional Container Repo
 
-# Update image.config.openshift.io/cluster to add additional repo
+- If you need to add an addional container repository to your openshift cluster.  
+  - Additional References:
+  - RH docs add additional image registry:  https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/images/image-configuration#images-configuration-allowed_image-configuration
+  - RH KCS Article:  https://access.redhat.com/solutions/4654511
+
+- Update the cluster image config
+```console
 oc edit image.config.openshift.io/cluster 
+```
 
 # To add an external registry update the spec: section, below is an example image.config.openshift.io/cluster CR
 
