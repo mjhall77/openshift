@@ -1,4 +1,0 @@
-https://github.com/OpenShiftDemos/openshift-ops-workshops/blob/ocp4-prod/workshop/content/logging-with-loki.adoc
-# To deploy/config Openshift logging the following operators are needed;  Loki, Cluster Logging and Observability
-
-

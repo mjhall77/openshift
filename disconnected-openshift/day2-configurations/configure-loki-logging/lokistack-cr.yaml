@@ -1,0 +1,18 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: logging-loki
+  namespace: openshift-logging
+spec:
+  managementState: Managed
+  size: 1x.extra-small # update the size based on deployment, see RH documentation
+  storage:
+    schemas:
+    - effectiveDate: '2024-10-01'  # update to the day before
+      version: v13
+    secret:
+      name: lokistack-s3  # update with your secret info
+      type: s3
+  storageClassName: gp3-csi
+  tenants:
+    mode: openshift-logging
