@@ -43,16 +43,22 @@ htpasswd -B </path/to/file> <username>
 - To remove a user, simply remove the entry from the file and save
 
 - To update secret with updated htpasswd file
+
+```console
 oc create secret generic htpass-secret --from-file=htpasswd --dry-run -o yaml -n openshift-config | oc replace -f -
+```
 
 # Group Users
 - To create groups for users in an htpasswd file
-  - oc adm groups new <groupname> user1 user2
+  - oc adm groups new groupname user1 user2
     - example: oc adm groups new developers developer1 developer2
 
 - Grant persmission to user or group
-  - oc adm policy add-role-to-user view <role > <username> -n <project>    # add cluster role to user in namespace - not cluster wide
+  - oc adm policy add-role-to-user role username -n project    # add cluster role to user in namespace - not cluster wide
+    - example: oc adm policy add-role-to-user view user1 -n test-project  # Grants user1 view access to project test-project
 
-  - oc adm policy add-cluster-role-to-user <cluster role> <user>       # add cluster role to user - cluster wide
+  - oc adm policy add-cluster-role-to-user cluster-role username       # add cluster role to user - cluster wide
+    - example: oc adm policy add-cluster-role-to-user cluster-admin admin1  # Grants admin1 cluster level admin
 
-  - oc adm policy add-cluster-role-to-group <cluster role> <group>       # add cluster role to group - cluster wide
+  - oc adm policy add-cluster-role-to-group cluster-role> groupname       # add cluster role to group - cluster wide
+    - example: oc adm policy add-cluster-role-to-user view auditors        # Grants auditors group cluster read access
