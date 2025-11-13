@@ -15,10 +15,32 @@ oc edit image.config.openshift.io/cluster
 
 **EXTREMELY IMPORTANT** When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.
 
-- Update the spec.registrySources section in image.config.openshift.io/cluster, example blow. 
+- Update the spec.registrySources section in image.config.openshift.io/cluster, if a cert is needed update/create the configmap specified in spec.additionalTrustCA.
+  - Update registry-config cm in openshift-config namespace (if needed):
+    ```console
+    oc edit cm registry-config -n openshift-config
+   ```
+  - Append the registry certificate, example below
+   ```yaml
+   data:
+    registry.example.com: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+    registry-with-port.example.com..5000: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+   ```
+
+  - To create registry-config if it does not exist
+    - example: oc create configmap registry-config --from-file=new-external-registry.com..8443=/etc/pki/ca-trust/source/anchors/new-external-registry.pem -n openshift-config
+   ```console
+   oc create configmap registry-config --from-file=<external_registry_address>=ca.crt -n openshift-config
+   ```
 
 ```console
-oc edit mage.config.openshift.io/cluster
+oc edit image.config.openshift.io/cluster
 ```
 
 ```yaml
@@ -34,29 +56,27 @@ spec:
     - registry.redhat.io
     - reg1.io/myrepo/myapp:latest
     - image-registry.openshift-image-registry.svc:5000
+  additionalTrustedCA:
+    name: registry-config
 ```
 
-# The Machine config operator has to update the nodes, wait for this process to complete:
-oc get mcp -w   (looking for UPDATED: True,  UPDATING: False,  DEGRADED: False) NOTE: this could take several minutes, all nodes need to have configuration change applied 
+- Next, the Machine config operator updates nodes has to update the nodes, wait for this process to complete.  After running the command below wait for status UPDATED: True,  UPDATING: False,  DEGRADED: False, this may take several minutes due to each node requiring the configuration change to be applied
 
-# Validate the configs have been applied
+```console
+oc get mcp -w   (looking for UPDATED: True,  UPDATING: False,  DEGRADED: False) NOTE: this could take several minutes, all nodes need to have configuration change applied 
+```
+
+- To validate the configs have been applied, the registries should appear in /etc/containers/policy.json under spec.registrySources.allowedRegistries
+
+```console
 oc debug node/<node_name>
 chroot /host
-cat /etc/containers/policy.json | jq '.'   # you should see the registries configured in image.config.openshift.io/cluster  spec.registrySources.allowedRegistries
+cat /etc/containers/policy.json | jq '.'
+```
 
-
+- 
 # If the registry requires a certificate for accessing, add to the spec.additionalTrustedCA.name configmap if exists otherwise create one. 
 
-## If the cm exists then update data portion for the new external registry
-data:
-  registry.example.com: |
-    -----BEGIN CERTIFICATE-----
-    ...
-    -----END CERTIFICATE-----
-  registry-with-port.example.com..5000: | 
-    -----BEGIN CERTIFICATE-----
-    ...
-    -----END CERTIFICATE-----
 
 ## If need to create use the following command:
 oc create configmap registry-config --from-file=<external_registry_address>=ca.crt -n openshift-config
