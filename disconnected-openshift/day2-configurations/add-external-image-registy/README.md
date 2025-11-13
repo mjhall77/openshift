@@ -15,30 +15,32 @@ oc edit image.config.openshift.io/cluster
 
 **EXTREMELY IMPORTANT** When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.
 
-- Update the spec.registrySources section in image.config.openshift.io/cluster, if a cert is needed update/create the configmap specified in spec.additionalTrustCA.
-  - Update registry-config cm in openshift-config namespace (if needed):
+- If a cert is needed update/create the registy-config configmap in openshift-config namespace
+
+- Update registry-config cm in openshift-config namespace:
     ```console
     oc edit cm registry-config -n openshift-config
    ```
-  - Append the registry certificate, example below
-   ```yaml
-   data:
-    registry.example.com: |
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
-    registry-with-port.example.com..5000: |
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
-   ```
+- Append the registry certificate, example below
+```yaml
+ data:
+  registry.example.com: |
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+  registry-with-port.example.com..5000: |
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+ ```
 
-  - To create registry-config if it does not exist
-    - example: oc create configmap registry-config --from-file=new-external-registry.com..8443=/etc/pki/ca-trust/source/anchors/new-external-registry.pem -n openshift-config
-   ```console
-   oc create configmap registry-config --from-file=<external_registry_address>=ca.crt -n openshift-config
-   ```
+- To create registry-config if it does not exist
+  - example: oc create configmap registry-config --from-file=new-external-registry.com..8443=/etc/pki/ca-trust/source/anchors/new-external-registry.pem -n openshift-config
+ ```console
+ oc create configmap registry-config --from-file=<external_registry_address>=ca.crt -n openshift-config
+ ```
 
+- Update the spec.registrySources section in image.config.openshift.io/cluster, if a cert is needed specify configmap in spec.additionalTrustCA.
 ```console
 oc edit image.config.openshift.io/cluster
 ```
@@ -74,50 +76,54 @@ chroot /host
 cat /etc/containers/policy.json | jq '.'
 ```
 
-- 
-# If the registry requires a certificate for accessing, add to the spec.additionalTrustedCA.name configmap if exists otherwise create one. 
-
-
-## If need to create use the following command:
-oc create configmap registry-config --from-file=<external_registry_address>=ca.crt -n openshift-config
-   example:   oc create configmap registry-config --from-file=new-external-registry.com..8443=/etc/pki/ca-trust/source/anchors/new-external-registry.pem -n openshift-config
-
-## update image.config.openshift.io/cluster
-spec:
-  additionalTrustedCA:
-    name: registry-config
-
-## If the external registry is secure first log into the external registry
+- If the external registry is secure first log into the external registry
 podman login -u <username> <external-image-registry>
 
-## Create a pull secret for registry if not all namespaces need to pull from the repo
+# Create a pull secret for a namespace only,not cluster wide access
+
+- Create a pull secret for registry if not all namespaces need to pull from the repo
+  - example: oc create secret docker-registry dev-registry-pull-secret --docker-server=dev-registry.example.com:8443 --docker-username=init --docker-password=password
+```console
 oc create secret docker-registry <registry-name>-pull-secret --docker-server=<registry:port> --docker-username=<username> --docker-password=<password> -n <namespace>
-  - example:  oc create secret docker-registry dev-registry-pull-secret --docker-server=dev-registry.example.com:8443 --docker-username=init --docker-password=password 
+```
 
-    ## Link secret to builder service account
-    oc secrets link builder <registry-name-pull-secret>
-      - example:  oc secretes link builder dev-registry-pull-secret
+- Link secret to builder service account
+  - example: oc secretes link builder dev-registry-pull-secret
+```config
+oc secrets link builder <registry-name-pull-secret>
+```
 
-## Add registry pull secret to the cluster pull secret if all namespaces are allowed to pull from repo
-# Download the pull secret to your local file system. 
+# Add registry pull secret to the cluster pull secret if all namespaces are allowed to pull from repo
+
+- Download the pull secret to your local file system. 
+```console
 oc extract secret/pull-secret -n openshift-config --to=.
+```
 
-# Add pull secret for external regsitry to the .dockerconfigjson file created from previous command
+- Add pull secret for external regsitry to the .dockerconfigjson file created from previous command
+```console
 oc login -u <username> <registry>
+```
 
-# Get pull secret for external registry
+- Get pull secret for external registry
+```console
 cat $XDG_RUNTIME_DIR/containers/auth.json
+```
 
-# Add external registry entry to .dockerconfigjson
-## IMPORTANT verify updated .dockerconfigjson is valid using the following process
+- Add external registry entry to .dockerconfigjson
+  - **IMPORTANT** verify updated .dockerconfigjson is valid using the following process
+```console
 podman logout <external-registry>
 podman login --authfile=.dockerconfigjson <external-registry>  # If .dockerconfigjson valid you should get return: Existing credentials are valid. Repeat process for all registries listed in .dockerconfigjson
+```
 
-
-# Update global pull secret 
+- Update global pull secret 
+```console
 oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=.dockerconfigjson
+```
 
-# Note it may take a couple minutes to update cluster with new pull secret.  Run following command waiting for Updated to be true for master, infra and workers
+- It may take a couple minutes to update cluster with new pull secret.  Run following command waiting for Updated to be true for master, infra and workers
+```console
 oc get mcp -w
-
+```
 
