@@ -6,6 +6,7 @@
   - RH KCS Article:  https://access.redhat.com/solutions/4654511
 
 - Update the cluster image config
+
 ```console
 oc edit image.config.openshift.io/cluster 
 ```
@@ -14,17 +15,11 @@ oc edit image.config.openshift.io/cluster
 
 ##***** EXTREMELY important When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.******##
 
+```yaml
 apiVersion: config.openshift.io/v1
 kind: Image
 metadata:
-  annotations:
-    release.openshift.io/create-only: "true"
-  creationTimestamp: "2019-05-17T13:44:26Z"
-  generation: 1
   name: cluster
-  resourceVersion: "8302"
-  selfLink: /apis/config.openshift.io/v1/images/cluster
-  uid: e34555da-78a9-11e9-b92b-06d6c7da38dc
 spec:
   registrySources: 
     allowedRegistries: 
@@ -33,8 +28,7 @@ spec:
     - registry.redhat.io
     - reg1.io/myrepo/myapp:latest
     - image-registry.openshift-image-registry.svc:5000
-status:
-  internalRegistryHostname: image-registry.openshift-image-registry.svc:5000
+```
 
 # The Machine config operator has to update the nodes, wait for this process to complete:
 oc get mcp -w   (looking for UPDATED: True,  UPDATING: False,  DEGRADED: False) NOTE: this could take several minutes, all nodes need to have configuration change applied 
