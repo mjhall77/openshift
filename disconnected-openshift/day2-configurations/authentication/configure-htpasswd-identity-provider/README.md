@@ -45,7 +45,7 @@ htpasswd -B </path/to/file> <username>
 - To update secret with updated htpasswd file
 
 ```console
-oc create secret generic htpass-secret --from-file=htpasswd --dry-run -o yaml -n openshift-config | oc replace -f -
+oc create secret generic htpass-secret --from-file=htpasswd=/path/to/file --dry-run -o yaml -n openshift-config | oc replace -f -
 ```
 
 # Group Users

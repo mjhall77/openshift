@@ -16,7 +16,7 @@ oc get csr | grep -i pending
 - The command above lists pending CSR that must be approved for the cluster to trust them
 
 ```console
-oc get csr -o name | xargs oc adm certificate approve
+oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs oc adm certificate approve
 
 ```
 
