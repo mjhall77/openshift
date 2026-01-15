@@ -1,17 +1,18 @@
-# Add Additional Container Repo
+# Mirror OpenShift container content for a disconnected installation
 
-- If you need to add an addional container repository to your openshift cluster.  
-  - Additional References:
-  - RH docs add additional image registry:  https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/images/image-configuration#images-configuration-allowed_image-configuration
-  - RH KCS Article:  https://access.redhat.com/solutions/4654511
+- A disconnected environment is an environment that does not have full access to the internet.
 
-- Update the cluster image config
+- OpenShift Container Platform is designed to perform many automatic functions that depend on an internet connection, such as retrieving release images from a registry or retrieving update paths and recommendations for the cluster. Without a direct internet connection, you must perform additional setup and configuration for your cluster to maintain full functionality in the disconnected environment.
 
-```console
-oc edit image.config.openshift.io/cluster 
-```
+# Download binaries needed for mirror process
 
-# To add an external registry update 
+- Binaries can be obtained from https://console.redhat.com/openshift/downloads
+  - **NOTE:** You will need your Red Hat credentials to log in
+
+**Openshift command-line interface (oc) for RHEL 9**
+<img src="Screenshot from 2026-01-15 12-58-13.png" width="200" height="100" alt="oc cli">
+ 
+
 
 **EXTREMELY IMPORTANT** When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.
 
