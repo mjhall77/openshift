@@ -4,36 +4,22 @@
 
 - OpenShift Container Platform is designed to perform many automatic functions that depend on an internet connection, such as retrieving release images from a registry or retrieving update paths and recommendations for the cluster. Without a direct internet connection, you must perform additional setup and configuration for your cluster to maintain full functionality in the disconnected environment.
 
-# Download binaries needed for mirror process
+# Downloads needed for mirror process
 
-- Binaries can be obtained from https://console.redhat.com/openshift/downloads
+- All can be obtained from https://console.redhat.com/openshift/downloads
   - **NOTE:** You will need your Red Hat credentials to log in
 
 - **Openshift command-line interface (oc) for RHEL 9**
   <img src="Screenshot from 2026-01-15 12-58-13.png" width="2000" height="800" alt="oc cli">
  
+- **OpenShift Client (oc) mirror plugin for RHEL 9**
+- **mirror registry for Red Hat OpenShift**
+  <img src="Screenshot from 2026-01-15 12-59-09.png" width="2000" height="800" alt="mirror">
+
+- **pull secret**
+  <img src="Screenshot from 2026-01-15 12-59-36.png" width="2000" height="800" alt="pull secret">
 
 
-**EXTREMELY IMPORTANT** When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.
-
-- If a cert is needed update/create the registy-config configmap in openshift-config namespace
-
-- Update registry-config cm in openshift-config namespace:
-    ```console
-    oc edit cm registry-config -n openshift-config
-   ```
-- Append the registry certificate, example below
-```yaml
- data:
-  registry.example.com: |
-    -----BEGIN CERTIFICATE-----
-    ...
-    -----END CERTIFICATE-----
-  registry-with-port.example.com..5000: |
-    -----BEGIN CERTIFICATE-----
-    ...
-    -----END CERTIFICATE-----
- ```
 
 - To create registry-config if it does not exist
   - example: oc create configmap registry-config --from-file=new-external-registry.com..8443=/etc/pki/ca-trust/source/anchors/new-external-registry.pem -n openshift-config
