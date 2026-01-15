@@ -9,8 +9,8 @@
 - Binaries can be obtained from https://console.redhat.com/openshift/downloads
   - **NOTE:** You will need your Red Hat credentials to log in
 
-**Openshift command-line interface (oc) for RHEL 9**
-<img src="Screenshot from 2026-01-15 12-58-13.png" width="200" height="100" alt="oc cli">
+- **Openshift command-line interface (oc) for RHEL 9**
+  <img src="Screenshot from 2026-01-15 12-58-13.png" width="2000" height="800" alt="oc cli">
  
 
 
