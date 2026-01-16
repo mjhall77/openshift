@@ -29,8 +29,6 @@
 
 - RHEL 9 server with 500GB or larger data volume recommended 
 
-- Install the follwoing packages: podman, nmstate
-
 - If your system has fapolicyd enabled, update policy
 ```console
 sudo systemctl stop fapolicyd.service
@@ -79,26 +77,28 @@ oc-mirror -c ./path/to/imageset-config.yaml --cache-dir=/path/to/data-drive file
 
 - RHEL 9 server with 500GB or larger data volume recommended 
   
+- Install the following packages: podman, nmstate
+
 - Untar the required binaries
 ```console
 tar -xvf mirror-registry.tar.gz    
 
-tar -xvf oc-mirror-tar.gz
+tar -xvf oc-mirror.rhel9.tar.gz
 
-tar -xvf openshift-client-linux.tar.gz
+tar -xvf openshift-client-linux-amd64-rhel9.tar.gz
 
-tar -xvf openshift-install-linux.tar.gz
+tar -xvf openshift-install-rhel9-amd64.tar.gz
 ```
 
 - Place binaries
 ```console
-sudo mv {mirror-registry, oc, oc-mirror, openshift-install} /usr/local/bin
+sudo mv {oc,oc-mirror,openshift-install-fips} /usr/local/bin
 
-sudo chown root:root /usr/local/bin/{mirror-registry, oc, oc-mirror, openshift-install}
+sudo chown root:root /usr/local/bin/{oc,oc-mirror,openshift-install-fips}
 
-sudo chmod +x /usr/local/bin/{mirror-registry, oc, oc-mirror, openshift-install}
+sudo chmod +x /usr/local/bin/{oc,oc-mirror,openshift-install-fips}
 
-sudo restorecon -v /usr/local/bin/{mirror-registry, oc, oc-mirror, openshift-install}
+sudo restorecon -v /usr/local/bin/{oc,oc-mirror,openshift-install-fips}
 ```
 
 - If your system has fapolicyd enabled, update policy
@@ -107,7 +107,6 @@ sudo systemctl stop fapolicyd.service
 
 sudo fapolicyd-cli --file add /usr/local/bin/oc-mirror
 sudo fapolicyd-cli --file add /usr/local/bin/oc
-sudo fapolicyd-cli --file add /usr/local/bin/mirror-registry
 sudo fapolicyd-cli --file add /usr/local/bin/openshift-install
 
 sudo fapolicyd-cli --update
@@ -121,15 +120,15 @@ sysctl -a | grep max_user_namespaces
 user.max_user_namespaces = 62372
 
 # If value less than 62372 set it
-vi /etc/sysctl.d/99-sysctl.conf
+sudo vi /etc/sysctl.d/99-sysctl.conf
 
-sysctl -p /etc/sysctl.d/99-sysctl.conf
+sudo sysctl -p /etc/sysctl.d/99-sysctl.conf
 ```
 
 - Set umask to 0022
 ```console
-sed :%s/077/022/gc /etc/bashrc
-sed :%s/077/022/gc /etc/profile
+sudo sed :%s/077/022/gc /etc/bashrc
+sudo sed :%s/077/022/gc /etc/profile
 ```
 
 - Open port 8443 for mirror registry
@@ -141,7 +140,7 @@ sudo firewall-cmd --reload
 ```console
 mkdir -p /data/mirror-registry
 
-mirror-registry install quayHostname $(hostname -f) --quayRoot /data/mirror-registry --quayStorage --/data/mirror-registry --initUser admin --initPassword redhat123
+sudo ./mirror-registry install quayHostname $(hostname -f) --quayRoot /data/mirror-registry --quayStorage --/data/mirror-registry --initUser admin --initPassword redhat123
 ```
 
 - Add self-signed certifate created during mirror-registry install
