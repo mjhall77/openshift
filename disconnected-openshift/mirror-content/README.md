@@ -140,17 +140,20 @@ sudo firewall-cmd --reload
 ```console
 mkdir -p /data/mirror-registry
 
-sudo ./mirror-registry install quayHostname $(hostname -f) --quayRoot /data/mirror-registry --quayStorage --/data/mirror-registry --initUser admin --initPassword redhat123
+sudo ./mirror-registry install quayHostname $(hostname -f) --quayRoot /data/mirror-registry --quayStorage /data/mirror-registry --initUser admin --initPassword redhat123
 ```
 
 - Add self-signed certifate created during mirror-registry install
 ```console
-sudo cp -v /data/mirror-regsitry/quay-rootCA/rootCA.pim /etc/pki/ca-trust/source/anchors/
+sudo cp -v /data/mirror-registry/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/
 
 sudo update-ca-trust
 
-# test login
+- test login
 podman login $(hostname -f):8443 
 ```
 
-
+- Disk to Mirror process
+```console
+oc-mirror -c ./imageset-config.yaml --from file://./mirror/ docker://$(hostname -f):8443 --v2
+```
