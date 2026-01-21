@@ -1,0 +1,160 @@
+# Feel free to modify to reflect the operators/images you're targeting for your install
+# To get an accurate representation of the current list of operators and their current default channels,
+#   run the following command on an internet-facing box that has the oc-mirror binary available (NOTE: it takes a few minutes to complete)
+#   oc-mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.20 --version=4.20 # Replace "4.20" with whatever minor release version you're targeting for the install
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v2alpha1
+archiveSize: 45    # Set this to the size of file your DTA process allows
+mirror:
+  platform:
+    # Uncommenting the following two lines and updating to reflect your specific architecture, will help decrease the size of the mirrored content.
+    # architectures:
+    #   - amd64
+    channels:
+      - type: ocp
+        name: stable-4.20
+        minVersion: 4.20.4
+        maxVersion: 4.20.4
+    graph: true
+  additionalImages:
+  operators:
+    # Red Hat Operator Index Catalog
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
+      packages:
+        # Advanced Cluster Management for Kubernetes
+        - name: advanced-cluster-management
+          channels:
+            - name: release-2.15
+        - name: multicluster-engine
+          channels:
+            - name: stable-2.10
+        # Advanced Cluster Security for Kubernetes
+        - name: rhacs-operator
+          channels:
+            - name: stable
+        # Quay
+        - name: quay-operator
+          channels:
+            - name: stable-3.16
+        - name: quay-bridge-operator
+          channels:
+            - name: stable-3.16
+        - name: container-security-operator
+          channels:
+            - name: stable-3.16
+        # Data Foundation Essentials
+        - name: odf-operator
+          channels:
+            - name: stable-4.20
+        - name: odf-csi-addons-operator
+          channels:
+            - name: stable-4.20
+        - name: ocs-operator
+          channels:
+            - name: stable-4.20
+        - name: mcg-operator
+          channels:
+            - name: stable-4.20
+        - name: odf-dependencies
+          channels:
+            - name: stable-4.20
+        - name: rook-ceph-operator
+          channels:
+            - name: stable-4.20
+        - name: recipe
+          channels:
+            - name: stable-4.20
+        - name: cephcsi-operator
+          channels:
+            - name: stable-4.20
+        - name: ocs-client-operator
+          channels:
+            - name: stable-4.20
+        - name: odf-prometheus-operator
+          channels:
+            - name: stable-4.20
+        - name: odr-cluster-operator
+          channels:
+            - name: stable-4.20
+        - name: odr-hub-operator
+          channels:
+            - name: stable-4.20
+        # Local Storage Operator
+        - name: lvms-operator
+          channels:
+            - name: stable-4.20
+        - name: local-storage-operator
+          channels:
+            - name: stable
+        # Web Terminal
+        - name: web-terminal
+          channels:
+            - name: fast
+        - name: devworkspace-operator
+          channels:
+            - name: fast
+        # Update Service
+        - name: cincinnati-operator
+          channels:
+            - name: v1
+        # Compliance Operator
+        - name: compliance-operator
+          channels:
+            - name: stable
+        # MetalLB Operator
+        - name: metallb-operator
+          channels:
+            - name: stable
+        # OpenShift Logging
+        - name: cluster-logging
+          channels:
+            - name: stable-6.4
+        - name: loki-operator
+          channels:
+            - name: stable-6.4
+        # OpenShift Service Mesh
+        - name: servicemeshoperator3
+          channels:
+            - name: stable
+        - name: kiali-ossm
+          channels:
+            - name: stable
+        - name: jaeger-productdd
+          channels:
+            - name: stable
+        # Cluster Observability Operator
+        - name: cluster-observability-operator
+          channels:
+            - name: stable
+        # Network Observability Operator
+        - name: netobserv-operator
+          channels:
+            - name: stable
+        # Keycloak Operator
+        - name: rhbk-operator
+          channels:
+            - name: stable-v26.4
+        # Cert Manager
+        - name: openshift-cert-manager-operator
+          channels:
+            - name: stable-v1
+        # Gitops Operator - ArgoCD
+        - name: openshift-gitops-operator
+          channels:
+            - name: latest
+        # Pipelines Operator - Teckton
+        - name: openshift-pipelines-operator-rh
+          channels:
+            - name: latest
+        # Devspaces
+        - name: devspaces
+          channels:
+            - name: stable
+
+    # Red Hat Community Operator Index Catalog
+    - catalog: registry.redhat.io/redhat/community-operator-index:v4.20
+      packages:
+        # Trident
+        - name: group-sync-operator
+          channels:
+            - name: alpha
