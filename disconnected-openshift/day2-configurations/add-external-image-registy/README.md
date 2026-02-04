@@ -7,13 +7,13 @@
 
 - Update the cluster image config
 
+**EXTREMELY IMPORTANT** When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.
+
 ```console
 oc edit image.config.openshift.io/cluster 
 ```
 
-# To add an external registry update 
-
-**EXTREMELY IMPORTANT** When the allowedRegistries parameter is defined, all registries, including the registry.redhat.io and quay.io registries and the default OpenShift image registry, are blocked unless explicitly listed. If you use this parameter, to prevent pod failure, add all registries including the registry.redhat.io and quay.io registries and the internalRegistryHostname to the allowedRegistries list, as they are required by payload images within your environment. For disconnected clusters, mirror registries should also be added.
+# Add a certificate for authentication to registry (optional)
 
 - If a cert is needed update/create the registy-config configmap in openshift-config namespace
 
