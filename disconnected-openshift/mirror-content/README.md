@@ -15,6 +15,9 @@
 - All can be obtained from https://console.redhat.com/openshift/downloads
   - **NOTE:** You will need Red Hat credentials associated with the account that contains OpenShift subscriptions
 
+- **Openshift Installation installer RHEL 9**
+  <img src="Screenshot From 2026-02-10 11-36-49.png" width="2000" height="800" alt="installer">
+
 - **Openshift command-line interface (oc) for RHEL 9**
   <img src="Screenshot from 2026-01-15 12-58-13.png" width="2000" height="800" alt="oc cli">
  
