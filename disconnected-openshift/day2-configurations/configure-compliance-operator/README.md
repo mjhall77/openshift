@@ -1,9 +1,9 @@
 # Openshift Compliance Operator
 - The OpenShift Container Platform Compliance Operator assists users by automating the inspection of numerous technical implementations and compares those against certain aspects of industry standards, benchmarks, and baselines.  The Compliance Operator lets OpenShift Container Platform administrators describe the required compliance state of a cluster and provides them with an overview of gaps and ways to remediate them.
 
-- rule.compliance is a single compliance check. For example the rule rhcos4-service-auditd-enabled checks if the auditd daemon is running on RHCOS.
-- profile.compliance is a collection of rules that form a single compliance baseline for a product. 
-- profilebundle.compliance is a collection of profiles for a single product where product might be ocp4 or rhcos4.
+> - rule.compliance is a single compliance check. For example the rule rhcos4-service-auditd-enabled checks if the auditd daemon is running on RHCOS.
+> - profile.compliance is a collection of rules that form a single compliance baseline for a product. 
+> - profilebundle.compliance is a collection of profiles for a single product where product might be ocp4 or rhcos4.
 
 - Update the spec.registrySources section in image.config.openshift.io/cluster, if a cert is needed specify configmap in spec.additionalTrustCA.
 ```console
