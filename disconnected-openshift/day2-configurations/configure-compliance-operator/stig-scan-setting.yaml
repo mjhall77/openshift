@@ -3,7 +3,8 @@ debug: true
 kind: ScanSetting
 metadata:
   name: stig 
-roles:
-  - worker
-  - master
-schedule: '0 1 * * *'
+spec:
+ roles:
+   - worker
+   - master
+ schedule: '0 1 * * *'
