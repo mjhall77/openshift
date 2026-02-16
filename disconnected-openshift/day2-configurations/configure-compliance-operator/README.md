@@ -26,68 +26,64 @@ oc describe profiles.compliance.openshift.io rhcos4-stig-v2r1 -n openshift-compl
 oc get profilebundles.compliance.openshift.io -n openshift-compliance
 ```
 
+# Build a Scan 
 
-
-```yaml
-apiVersion: compliance.openshift.io/v1alpha1
-debug: true
-kind: ScanSetting
-metadata:
-  name: stig 
-  namespace: openshift-compliance
-spec:
-  rawResultStorage:
-    size: "5Gi"
-    pvAccessModes:
-      - ReadWriteMany
-    storageClassName: nfs-manual
-    volumeMode: Filesystem
-    rotaion: 3
-  roles:
-    - worker
-    - master
-  schedule: '0 1 * * *'
+- The ScanSetting defines the operational parameters of the scan. It doesn't tell the operator which security rules to check; instead, it defines how the infrastructure should behave during the process; schedule, storage, retention, roles.  A sample stig-scansetting.yaml is provided in the repo, you can use as is or modify then apply
+```console
+oc create -f stig-scansetting.yaml
 ```
 
-# Create Scan settings by applying the yaml file.  There are two important pieces of a ScanSettingBinding object:
-# profiles: Contains a list of (name,kind,apiGroup) tuples that make up a selection of the Profile (or a TailoredProfile that we will explain later) to scan your environment with.
-# settingsRef: A reference to a ScanSetting object also using the (name,kind,apiGroup) tuple that references the operational constraints.
-oc apply -f stig-scan-setting-binding.yaml -n openshift-compliance
-oc apply -f stig-scan-setting.yaml -n openshift-compliance
+- The ScanSettingBinding is the object that actually triggers the work. It acts as a bridge that links your desired security policies to the operational settings defined in the ScanSetting.  A sample stig-scansettingibingd.yaml is provided in the repo, you may need to update the profile to a version available in your environment.
+```console
+oc create -f stig-scansettingbinding.yaml
+```
 
-# View progress of scans - depending on number of profiles and nodes it could take some time for the scans to complete
+- When a ScanSettingBinding is created, the Compliance Operator looks at the referenced ScanSetting. It then generates a ComplianceSuite (and subsequently ComplianceScan objects) for every profile listed in the binding, using the schedule and storage rules you defined.
+
+- View progress of scans - depending on number of profiles and nodes it could take some time for the scans to complete
+```console
 oc get compliancesuites.compliance.openshift.io -n openshift-compliance
+
 oc get compliancescans.compliance.openshift.io -n openshift-compliance
+```
 
-# View the checks that are not compliance with the rule
-oc get compliancecheckresults.compliance.openshift.io -n openshift-compliance
+- View the checks that did not pass the compliance rule
+```console
+oc get compliancecheckresults.compliance.openshift.io -n openshift-compliance | grep -i failed
+```
 
-# View the remediations for the rules that did not pass the check
+- View the remediations for the rules that did not pass the check
+```console
 oc get complianceremediations.compliance.openshift.io -n openshift-compliance
+```
 
-# Apply remediations -> This will cause the MachineConfig operoatr to create an object and do a rolling reboot all imapacted nodes
+- Apply remediations -> This will cause the MachineConfig operoatr to create an object and do a rolling reboot all imapacted nodes
+```console
 $ oc patch complianceremediations rhcos4-e8-worker-sysctl-kernel-dmesg-restrict -p '{"spec":{"apply":true}}' --type=merge
+```
 
-# To apply multiple remediaitons you will need to pause the MachineConfigPool -> Do not forget to unpause
+- To apply multiple remediaitons you will need to pause the MachineConfigPool -> Do not forget to unpause
+```console
 $ oc patch machineconfigpools worker -p '{"spec":{"paused":true}}' --type=merge
+```
 
-# To rescan the cluster run the following
+- To rescan the cluster run the following
+```console
 oc annotate -n openshift-compliance compliancescans/ocp4-stig-v2r1 compliance.openshift.io/rescan=
+```
 
------------------------- pull the reports -------------------------
-
-# To retrieve the scan results.  Define and spawn a pod that mounts the PVC and sleeps, 
-# then copy the files out of the PVC to a local filesystem.
+# Pull the reports
+- To retrieve the scan results.  Define and spawn a pod that mounts the PVC and sleeps, then copy the files out of the PVC to a local filesystem.
+```console
 oc apply -f pv-extract.yaml -n openshift-compliance
+```
 
-# Extract the scan results
+- Extract the scan results
+```console
 oc cp pv-extract:/master-scan-results ./extract_results_dir -n openshift-compliance
+```
 
-# Delete the pv-extract pod due it mounting the pv
+- Delete the pv-extract pod due it mounting the pv
+```console
 oc delete pod pv-extract
-
-###NOTES Need to add content on what to do with the bzip2 files
-
-
-
-
+```

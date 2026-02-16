@@ -5,12 +5,6 @@ metadata:
   name: stig 
   namespace: openshift-compliance
 spec:
-  rawResultStorage:
-    size: "5Gi"
-    pvAccessModes:
-      - ReadWriteMany
-    storageClassName: nfs-manual
-    volumeMode: Filesystem
     rotaion: 3
   roles:
     - worker
