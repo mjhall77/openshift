@@ -1,50 +1,53 @@
 # Openshift Compliance Operator
-- The OpenShift Container Platform Compliance Operator assists users by automating the inspection of numerous technical implementations and compares those against certain aspects of industry standards, benchmarks, and baselines.  The Compliance Operator lets OpenShift Container Platform administrators describe the required compliance state of a cluster and provides them with an overview of gaps and ways to remediate them.
+- The OpenShift Compliance Operator assists users by automating the inspection of numerous technical implementations and compares those against certain aspects of industry standards, benchmarks, and baselines.  The Compliance Operator lets OpenShift administrators describe the required compliance state of a cluster and provides them with an overview of gaps and ways to remediate them.
 
-> - rule.compliance is a single compliance check. For example the rule rhcos4-service-auditd-enabled checks if the auditd daemon is running on RHCOS.
-> - profile.compliance is a collection of rules that form a single compliance baseline for a product. 
-> - profilebundle.compliance is a collection of profiles for a single product where product might be ocp4 or rhcos4.
-
-- Update the spec.registrySources section in image.config.openshift.io/cluster, if a cert is needed specify configmap in spec.additionalTrustCA.
+- A rule is a single compliance check. For example the rule rhcos4-service-auditd-enabled checks if the auditd daemon is running on RHCOS. To View the contents of a rule
 ```console
-oc edit image.config.openshift.io/cluster
+oc get rule.compliance rhcos4-accounts-no-uid-except-zero -n openshift-compliance -oyaml
 ```
+
+- To view contents of a rule
+```console
+oc get rule.compliance rhcos4-accounts-no-uid-except-zero -nopenshift-compliance -oyaml
+```
+
+- A profile is a collection of rules that form a single compliance baseline for a product. For a list of profiles available in the deployed compliance operator version
+```console
+oc get profiles.compliance.openshift.io -n openshift-compliance
+```
+
+- View the profile and list of rules 
+```console
+oc describe profiles.compliance.openshift.io rhcos4-stig-v2r1 -n openshift-compliance
+```
+
+- A profilebundle is a collection of profiles for a single product where product might be ocp4 or rhcos4. To view the profile bundles
+```console
+oc get profilebundles.compliance.openshift.io -n openshift-compliance
+```
+
+
 
 ```yaml
-apiVersion: config.openshift.io/v1
-kind: Image
+apiVersion: compliance.openshift.io/v1alpha1
+debug: true
+kind: ScanSetting
 metadata:
-  name: cluster
+  name: stig 
+  namespace: openshift-compliance
 spec:
-  registrySources: 
-    allowedRegistries: 
-    - example.com
-    - quay.io
-    - registry.redhat.io
-    - reg1.io/myrepo/myapp:latest
-    - image-registry.openshift-image-registry.svc:5000
-  additionalTrustedCA:
-    name: registry-config
+  rawResultStorage:
+    size: "5Gi"
+    pvAccessModes:
+      - ReadWriteMany
+    storageClassName: nfs-manual
+    volumeMode: Filesystem
+    rotaion: 3
+  roles:
+    - worker
+    - master
+  schedule: '0 1 * * *'
 ```
-
-
-# rule.compliance is a single compliance check. For example the rule rhcos4-service-auditd-enabled checks if the auditd daemon is running on RHCOS.
-# profile.compliance is a collection of rules that form a single compliance baseline for a product. 
-# profilebundle.compliance is a collection of profiles for a single product where product might be ocp4 or rhcos4.
-
-
------------------------------ build a scan --------------------------------------------
-# Get a list of profiles.compliance
-oc get profiles.compliance.openshift.io -n openshift-compliance  
-
-# View the profile and list of rules 
-oc describe profiles.compliance.openshift.io rhcos4-stig-v2r1 -n openshift-compliance
-
-# View the profile bundles
-oc get profilebundles.compliance.openshift.io -n openshift-compliance
-
-# View contents of a rule
-oc get rule.compliance rhcos4-accounts-no-uid-except-zero -nopenshift-compliance -oyaml
 
 # Create Scan settings by applying the yaml file.  There are two important pieces of a ScanSettingBinding object:
 # profiles: Contains a list of (name,kind,apiGroup) tuples that make up a selection of the Profile (or a TailoredProfile that we will explain later) to scan your environment with.

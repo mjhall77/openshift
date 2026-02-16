@@ -3,8 +3,16 @@ debug: true
 kind: ScanSetting
 metadata:
   name: stig 
+  namespace: openshift-compliance
 spec:
- roles:
-   - worker
-   - master
- schedule: '0 1 * * *'
+  rawResultStorage:
+    size: "5Gi"
+    pvAccessModes:
+      - ReadWriteMany
+    storageClassName: nfs-manual
+    volumeMode: Filesystem
+    rotaion: 3
+  roles:
+    - worker
+    - master
+  schedule: '0 1 * * *'
