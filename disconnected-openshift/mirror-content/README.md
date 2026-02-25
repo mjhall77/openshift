@@ -63,12 +63,16 @@ oc-mirror --v2 --help
 umask 0022
 ```
 
-- Copy Pull Secret
+- Copy Pull Secret -  XDG_RUNTIME_DIR is temporary location, .docker will persist. 
 
 ```
 mkdir -p $XDG_RUNTIME_DIR/containers
 
 cp pull-secret.txt $XDG_RUNTIME_DIR/containers/auth.json
+
+mkdir -p ~/.docker
+
+cp pull-secret.txt ~/.docker/config.json
 ```
 
 - Mirror to disk process
