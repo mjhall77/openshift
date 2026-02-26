@@ -15,7 +15,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:a7
     rootDeviceHints:
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName:  /dev/disk/by-path/pci-0000:04:00.0-nvme-1 # Change this to the drive that OCP should install the OS on
     networkConfig:
       interfaces:
         - name: bond0.300  # Name of interface, recommend naming same as vlan
@@ -65,7 +65,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:a7
     rootDeviceHints:
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:04:00.0-nvme-1 # Change this to the drive that OCP should install the OS on
     networkConfig:
       interfaces:
         - name: bond0.300  # Name of interface, recommend naming same as vlan
