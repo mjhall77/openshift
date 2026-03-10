@@ -9,7 +9,9 @@
 ```console
 oc new-project rhbk --description "Red Hat Build of Keycloak" --display-name "Red Hat Build of Keycloak"
 ```
-- Install the Crunchy Postgres for Kubernetes and Red Hat Build of Keycloak Operators into the namespace you just created
+- Install the Crunchy Postgres for Kubernetes (Certified) keeping defaults
+
+- Install the Red Hat Build of Keycloak Operator into the rhbk namespace
 
 - Deploy the Posgres Cluster - Installed Operators -> Crunchy Postgres for Kubernetes -> Postgres Cluster and paste the following yaml
 
