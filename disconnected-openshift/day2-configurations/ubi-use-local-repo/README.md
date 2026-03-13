@@ -5,6 +5,8 @@
 
 - Assumptions:  The UBI images and UBI repository are available in air-gapped environment
 
+- For a list of UBI repos: https://access.redhat.com/articles/4238681
+
 - Log into the registry
 ```console
 podman login -u <username> <registry:port>
