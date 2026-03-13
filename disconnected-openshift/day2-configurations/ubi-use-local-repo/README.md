@@ -21,21 +21,25 @@ FROM <internal registry fqdn:port>/ubi9/ubi:latest
 # Remove default repo and disable subscription-manager
 RUN rm /etc/yum.repos.d/* && sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
 
+# Copy CA to /etc/pki/ca-trust/source/anchors
+COPY CA.crt /etc/pki/ca-trust/source/anchors
+
 # Copy ubi9 repo file pointing to new location
 COPY ubi9.repo /etc/yum.repos.d/ 
-RUN yum update -y 
+RUN yum update -y && update-ca-trust
+ 
 ```
 - Create ubi9.repo file in the local-ubi directory
 ```yaml
 [local-baseos]
 name=UBI9 Baseos
-baseurl=http:/<repo.fqdn>/repos/ubi9/baseos
+baseurl=https://<repo.fqdn>/repos/ubi9/baseos
 gpgcheck=0
 enabled=1
 
 [local-appstream]
 name=UBI9 Appstream
-baseurl=http://<repo.fqdn>/repos/ubi9/appstream
+baseurl=https://<repo.fqdn>/repos/ubi9/appstream
 gpgcheck=0
 enabled=1
 ```
