@@ -106,4 +106,8 @@ oc apply -f ldap-sync-cron-job.yaml
 
 ```console
 oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kuberetes.io/autoupdate": "false" } } }'
+
+oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
 ```
+
+

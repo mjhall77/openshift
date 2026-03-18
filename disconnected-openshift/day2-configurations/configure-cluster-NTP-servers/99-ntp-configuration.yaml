@@ -1,0 +1,17 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker # Change to 'master' for control plane
+  name: 99-worker-ntp
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64, <YOUR_BASE64_STRING_HERE>
+        mode: 420
+        overwrite: true
+        path: /etc/chrony.conf
