@@ -21,7 +21,9 @@ oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patc
 ```
 
 - Remove PVC claim for registry
+```console
 oc delete pvc registry-storage-pvc -n openshift-image-registry
+```
 
 # Expose the Internal Image registry externally
 - This external access enables you to log in to the registry from outside the cluster using the route address and to tag and push images to an existing project by using the route host
