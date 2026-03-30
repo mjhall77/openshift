@@ -17,6 +17,10 @@ logdir /var/log/chrony
 ```console
 cat chrony.conf | base64 -w0
 ```
+
+- If there is an existing NTP MachineConfig, it is recommended to update that configuration with the base64 string from previous step.
+
+# Following steps if no NTP MachineConfig currently exists
 - Create 99-ntp-configuration.yaml MachineConfig and update configuation with the base64 string on line 14
 ```yaml
 apiVersion: machineconfiguration.openshift.io/v1

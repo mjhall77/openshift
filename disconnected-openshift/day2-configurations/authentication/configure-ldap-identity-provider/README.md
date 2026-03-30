@@ -110,4 +110,8 @@ oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotati
 oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
 ```
 
+- If you want to adjust the Openshift Console timeout, set the last field to the duration you want.  As is, it will allow the session to be open for 8 hours
+```console
+oc patch oauth cluster --type='merge' -p '{"spec": {"tokenConfig": {"accessTokenMaxAgeSeconds": 28800}}}'
+```
 
