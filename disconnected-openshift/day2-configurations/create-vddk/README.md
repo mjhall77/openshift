@@ -29,7 +29,11 @@ EOF
 ```
 
 # Build the image
+```console
 podman build . -t <registry_route_or_server_path>/vddk:<tag>
+```
 
 # Push image to disconnected registry
+```console
 podman push <registry_route_or_server_path>/vddk:<tag>
+```
