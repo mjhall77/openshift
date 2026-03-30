@@ -15,7 +15,9 @@ oc get ingresscontrollers.operator.openshift.io -o yaml -n openshift-ingress-ope
 oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch '{"spec":{"nodePlacement":{"nodeSelector":{"matchLabels":{"node-role.kubernetes.io/infra":""}},"tolerations":[{"effect":"NoSchedule","key":"node-role.kubernetes.io/infra","operator":"Exists"}]}}}'
 ```
 
-# For most deployments 2 router pods are sufficent which are generally spread across different nodes using anti-affinity rules.  The command below increases the number of router pods.
+# Increase the number of router pods.
+- Most deployments 2 router pods are sufficent which are generally spread across different nodes using anti-affinity rules.
+
 ```console
 oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch '{"spec":{"replicas": 3}}'
 ```
