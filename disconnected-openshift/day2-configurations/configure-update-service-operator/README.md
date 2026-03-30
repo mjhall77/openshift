@@ -19,9 +19,9 @@ oc patch image.config.openshift.io/cluster --type='merge' -p '{"spec":{"addition
 ```
 
 # Create the update service via the gui and provide the required content
-. name: cluster-update-service
-. graph-image is typically in openshift/graph-image, be sure to include the :latest tag
-. releases is typically openshift/release-images
+- name: cluster-update-service
+- graph-image is typically in openshift/graph-image, be sure to include the :latest tag
+- releases is typically openshift/release-images
 
 # Configure the Cluster Version Operator
 ```console
