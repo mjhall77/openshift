@@ -1,8 +1,8 @@
 apiVersion: metallb.io/v1beta1
 kind: BGPAdvertisement
 metadata:
-  name: mikeynet-bgpadvertisement
+  name: clustername-bgpadvertisement
   namespace: metallb-system
 spec:
   ipAddressPools:
-  - mikeynet-ipaddresspool
+  - clustername-ipaddresspool
