@@ -58,6 +58,9 @@ spec:
     - registry.redhat.io
     - reg1.io/myrepo/myapp:latest
     - image-registry.openshift-image-registry.svc:5000
+    insecureRegistries:
+    - "my-insecure-registry.example.com:5000"
+    - "10.0.0.1:5000"
   additionalTrustedCA:
     name: registry-config
 ```
