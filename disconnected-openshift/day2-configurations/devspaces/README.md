@@ -1,11 +1,66 @@
 # Red Hat Devspaces Disconnected 
 - Red Hat OpenShift Dev Spaces is a web-based, collaborative integrated development environment (IDE) that is specifically optimized for OpenShift. It provides consistent, pre-configured, and secure container-based developer workspaces, eliminating "it works on my machine" issues by standardizing environments. 
 
+- To provide an internet connected feel for devspaces there are a couple of things that need to be created / pulled from an internet facing system
+  - Build plugin repo
+  - Build sample devfile repo (optional, recommended for inital setup)
+  - devspaces and devworkspace-operator
+
+## Build the plugin repo you will need to have podman, git and yarn installed
+```console
+sudo dnf install podman yarn git -y
+```
+
+- Clone repo and update openvsx-sync.json file and build, depending on the number of plugins it could take several minutes to build
+```console
+git clone https://github.com/redhat-developer/che-plugin-registry.git
+
+cd che-plugin-registry 
+
+vim openvsx-sync.json  #optional if you want to add / remove plugins
+
+./build.sh
+```
+
+- Image quay.io/eclipse/che-plugin-registry:next will be created
+```console
+podman images
+```
+
+- Save index image to tarball for export to disconnected environment
+```console
+podman save quay.io/eclipse/che-plugin-registry:next > che-plugin-registry-next.tar
+```
+
+## Build sample template devfiles image 
+- Clone repo, update stack directory and build, depending on the number of sample templates in stack directory it could take a couple minutes to build
+NOTE: We will need to add the image from each devfile.yaml to additionalImages in the imageset-config so the workspace can launch.  Recommendation for the platform and developers to sync on workspaces requried. 
+```console
+git clone https://github.com/devfile/registry.git
+
+export USE_PODMAN=true
+
+# Add/Remove sample templates from stack directory.  
+
+bash .ci/build.sh linux/amd64 offline
+```
+
+- Save index image to tarball for export to disconnected environment
+```console
+podman save localhost/devfile-index:latest > devfile-index-latest.tar
+```
 
 ## Need to pull the following content from an internet connected machine
-- Add the following to the redhat-registry-index section in imageset-config
+- Add the following to the redhat-registry-index section in imageset-config.yaml
 ```yaml
-packages:
+  additionalImages:
+    - name: <image in devfile for stack>  
+    - name: <image in devfile for stack>
+    - name: <image in devfile for stack>
+  operators:
+    # Red Hat Operator Index Catalog
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
+      packages:
         - name: devspaces
           channels:
             - name: stable
@@ -14,65 +69,62 @@ packages:
             - name: fast
 ```
 
-- Add the plugin image to additional images section of image-config.yaml..   Get latest release:  https://catalog.redhat.com/en/search?q=devspaces
-  NOTE: if you require additional plugins you will need to create a custom plugin regsitry:  https://github.com/eclipse-che/che-plugin-registry
-```yaml
-mirror:
-  additionalImages:
-    - name: registry.redhat.io/devspaces/trava-plugin-registry-rhel8:3.15 # Use your specific version
-```
+## Checklist to transfer to disconnected network
+  - imageset-config.yaml
+  - d2m mirror_seq_XXXXX.tar
+  - che-plugin-registry-next.tar
+  - registry-support-repo.tgz  # located in this repo
+  - devfile-index-latest.tar
 
-- Build Getting started template devfiles image requires podman to be installed
+## Disconnected Openshift Cluster Actions
+- Disk-2-Mirror the images using oc-mirror
+- Deploy the devspaces operator via gui - devworkspace-operator gets installed automatically
+
+- Push the devfile image to local repo 
 ```console
-mkdir plugin-registry-repo
+podman load --input devfile-index-latest.tar 
 
-git clone https://github.com/devfile/registry.git
+podman tag localhost/devfile-index:latest <internal-registry-fqdn>:8443/devfile-index:latest
 
-cd plugin-registry-repo
-
-export USE_PODMAN=true
-
-bash .ci/build.sh linux/arm64
+podman push <internal-registry-fqdn>:8443/devfile-index:latest
 ```
 
-- Save index image to tarball for export to disconnected environment
+- Push the plugin registry image to local repo
 ```console
-podman save localhost/devfile-index:latest > defile-index-latest.tar
+podman load --input devfile-index-latest.tar
+
+podman tag quay.io/eclipse/che-plugin-registry:next <internal-registry-fqdn>:8443/eclipse/che-plugin-registry:next
+
+podman push <internal-registry-fqdn>:8443/eclipse/che-plugin-registry:next
 ```
 
-## Disconnected Oenshift Cluster Actions
-- Deploy the devspaces and devworkspaces-operators via gui
+- Install Devspaces Operator via Gui Ecosystem -> Software Catalog -> Red Hat OpenShift Dev Spaces -> Install (keep defaults).  You should notice that the DevWorkspace Operator gets installed at the sametime Dev Spaces operator is installed
 
-- Create a CheCluster object in the openshift-devspaces namespace
-```yaml
-apiVersion: org.eclipse.che/v1alpha1
-kind: CheCluster
-metadata:
-  name: devspaces
-  namespace: openshift-devspaces
-spec:
-  components:
-    cheServer:
-      extraProperties:
-        # Redirect the "Getting Started" samples to your internal Git server
-        CHE_SAMPLES_CONFIG_JSON_URL: "http://internal-git.com/samples/samples.json"
-    devfileRegistry:
-      externalDevfileRegistries:
-        - url: "https://devfile-registry.apps.your-cluster.com"
-    pluginRegistry:
-      openVsxRegistryUrl: "https://your-internal-open-vsx.com"
-  networking:
-    tlsSupport: true
-  # Ensure workspaces use your internal registry for stack images
-  devEnvironments:
-    defaultComponents:
-      - name: universal-developer-image
-        container:
-          image: "your-internal-registry.com/devspaces/udi-rhel8:latest"
+- Create OpenShift project devspaces
+```console
+oc new-project devspaces
 ```
 
+- Create CheCluster via GUI, Ecosystem -> Installed Operators -> DevSpaces -> Create instance.   NOTE: Ensure project is set to devspaces namesapce and keep defaults
 
-- Get the lates 
-## Create the offline devfile and plugin registry
+- Deploy the devfile registry
+```console
+tar -xvf registry-support-repo.tgz
+
+cd registry-support-repo
+bash ./helm-openshift-install.sh --set devfileIndex.image=<interal-registry-fqdn:port>/library/devfile-index --set devfileIndex.tag=latest
+```
+
+- Once complete update the cheCluster devspaces CR with the route
+```console
+oc get route 
+
+oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfileRegistry": {"externalDevfileRegistries": [{"url": "http://<devfile-registry route>"}]}}}}'
+```
+
+- Update pluginRegistry repo
+```console
+oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/eclipse/che-plugin-registry:next"}]}}}}}'
+```
 
 
