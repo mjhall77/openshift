@@ -50,6 +50,13 @@ bash .ci/build.sh linux/amd64 offline
 podman save localhost/devfile-index:latest > devfile-index-latest.tar
 ```
 
+- Copy repo needed to deploy devfile registry
+``` console
+git clone https://github.com/devfile/registry-support.git
+
+tar -cvf registry-support-repo.tgz registry-support/*
+```
+
 ## Need to pull the following content from an internet connected machine
 - Add the following to the redhat-registry-index section in imageset-config.yaml
 ```yaml
@@ -73,7 +80,7 @@ podman save localhost/devfile-index:latest > devfile-index-latest.tar
   - imageset-config.yaml
   - d2m mirror_seq_XXXXX.tar
   - che-plugin-registry-next.tar
-  - registry-support-repo.tgz  # located in this repo
+  - registry-support-repo.tgz 
   - devfile-index-latest.tar
 
 ## Disconnected Openshift Cluster Actions
