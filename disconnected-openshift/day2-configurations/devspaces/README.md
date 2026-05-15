@@ -1,6 +1,9 @@
 # Red Hat Devspaces Disconnected 
 - Red Hat OpenShift Dev Spaces is a web-based, collaborative integrated development environment (IDE) that is specifically optimized for OpenShift. It provides consistent, pre-configured, and secure container-based developer workspaces, eliminating "it works on my machine" issues by standardizing environments. 
 
+- To improve developer experience recommend deploying the kubernetes imagepuller operator from the community index.  The operator essentially automates the proces of "pre-pulling" images identified to all worker nodes thus reducing the time to start a devspaces workspace. 
+
+
 - To provide an internet connected feel for devspaces there are a couple of things that need to be created / pulled from an internet facing system
   - Build plugin repo
   - Build sample devfile repo (optional, recommended for inital setup)
@@ -134,4 +137,25 @@ oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfi
 oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/eclipse/che-plugin-registry:next"}]}}}}}'
 ```
 
+## Configure the number of devspaces instances for a user:
+- By default a devuser can have an unlimited number of workspaces but only 1 workspace running at a time.  The following section will help you configure the number of workpsaces and running workspaces allowed per user.
 
+- Get the number of workspaces a user can have.  A -1 indicates unlimited
+```console
+oc get checluster/devspaces -n devspaces -o jsonpath='{.spec.devEnvironments.maxNumberOfWorkspacesPerUser}'
+```
+
+- Get the number of workspaces a user can have, defualt is 1.  If there no value is returned then 1 running devsapce per user
+```console
+oc get checluster/devspaces -n devspaces -o jsonpath='{.spec.devEnvironments.maxNumberOfRunningWorkspacesPerUser}'
+```
+
+- Set the number of workspaces a user can have.
+```console
+oc patch checluster/devspaces -n devspaces --type='merge' -p '{"spec":{"devEnvironments":{"maxNumberOfWorkspacesPerUser": 3}}}'
+```
+
+- Set the number of running workspaces a user can have.
+```console
+oc patch checluster/devspaces -n devspaces --type='merge' -p '{"spec":{"devEnvironments":{"maxNumberOfRunningWorkspacesPerUser": 3}}}'
+```
