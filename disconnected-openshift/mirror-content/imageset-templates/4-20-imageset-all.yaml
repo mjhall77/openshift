@@ -1,0 +1,160 @@
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  platform:
+    channels:
+      - name: stable-4.20
+        maxVersion: 4.20.21
+        shortestPath: true
+    graph: true
+  operators:
+    # Redhat Operator Index  
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:4.20
+      packages:
+        # RHOAI - You need to declare a min/max or you will pull multiple version
+        - name: rhods-operator
+          defaultChannel: stable-3.3
+          channels:
+            - name: stable-3.3
+              minVersion: 3.3.2
+              maxVersion: 3.3.2
+        - name: rhods-prometheus-operator
+        - name: serverless-operator
+        - name: jobset-operator
+        - name: openshift-custom-metrics-autoscaler-operator
+        - name: lws-operator
+        - name: rhcl-operator
+        - name: kueue-operator
+        - name: nfd
+        - name: sriov-network-operator
+        - name: authorino-operator
+        - name: openshift-cert-manager-operator
+
+        # Standard operators for Day-2
+        - name: compliance-operator
+        - name: web-terminal
+        - name: cincinnati-operator
+        - name: cluster-observability-operator
+        - name: netobserv-operator
+
+        # Logging
+        - name: cluster-logging
+        - name: loki-operator
+
+        # ACM
+        - name: advanced-cluster-management
+        - name: multicluster-engine
+
+        # ACS
+        - name: rhacs-operator
+
+        # Quay
+        - name: quay-operator
+        - name: quay-bridge-operator
+        - name: container-security-operator
+
+        # ODF
+        - name: odf-operator
+        - name: odf-csi-addons-operator
+        - name: ocs-operator
+        - name: mcg-operator
+        - name: odf-dependencies
+        - name: rook-ceph-operator
+        - name: recipe
+        - name: cephcsi-operator
+        - name: ocs-client-operator
+        - name: odf-prometheus-operator
+        - name: odr-cluster-operator
+        - name: odr-hub-operator
+        - name: lvms-operator
+        - name: local-storage-operator
+
+        # Virtualization
+        - name: kubevirt-hyperconverged
+        - name: kubernetes-nmstate-operator
+        - name: mtv-operator
+        - name: nfd
+
+        # Confidential Compute
+        - name: sandboxed-containers-operator
+        - name: trustee-operator
+
+        # Update Service
+        - name: cincinnati-operator
+
+        # Devspaces
+        - name: devspaces
+        - name: devworkspace-operator
+
+        # OpenShift Service Mesh
+        - name: servicemeshoperator3
+        - name: kiali-ossm
+        - name: jaeger-product
+
+        # MetalLB Operator
+        - name: metallb-operator
+
+        # Keycloak Operator
+        - name: rhbk-operator
+
+        # Openshift APOs for Data Protection
+        - name: redhat-oadp-operator
+
+        # Red Hat SSO
+        - name: rhsso-operator
+
+        # Ansible Automation Platform Operator
+        - name: ansible-automation-platform-operator
+
+        # Devops
+        - name: mta-operator
+        - name: openshift-gitops-operator 
+        - name: openshift-pipelines-operator-rh
+
+    # Red Hat Certified Operator Index Catalog     
+    - catalog: registry.redhat.io/redhat/certified-operator-index:v4.20
+      packages:
+        # NVIDIA GPU Operator
+        - name: gpu-operator-certified
+          channels:
+            - name: v26.3
+              minVersion: 26.3.1
+              maxVersion: 26.3.1
+        # Trident
+        - name: trident-operator
+          channels:
+            - name: stable
+
+    # Red Hat Community Operator Index Catalog
+    - catalog: registry.redhat.io/redhat/community-operator-index:v4.20
+      packages:
+        # Group Sync Operator
+        - name: group-sync-operator
+        - name: kubernetes-imagepuller-operator
+
+  additionalimages:
+    # Standard Day-2 images 
+    - name: registry.redhat.io/ubi8/ubi:latest
+    - name: registry.redhat.io/ubi8/ubi-init:latest
+    - name: registry.redhat.io/ubi8/podman:latest
+    - name: registry.redhat.io/rhel9/support-tools:latest
+    - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+    - name: registry.redhat.io/openshift4/ose-must-gather:latest
+    - name: registry.redhat.io/ubi9/ubi:latest
+    - name: registry.redhat.io/odf4/odf-must-gather-rhel9:v4.20
+    - name: registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v4.20
+
+    # The following are for the Boot Images for various VM OS's (For OpenShift Virtualization). Feel free to remove/update as needed
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.4.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.6.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.8.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.10.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:latest
+    - name: registry.redhat.io/rhel9/rhel-guest-image:9.2
+    - name: registry.redhat.io/rhel9/rhel-guest-image:9.4
+    - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+    - name: quay.io/containerdisks/centos:7-2009
+    - name: quay.io/containerdisks/centos-stream:8-latest
+    - name: quay.io/containerdisks/centos-stream:9-latest
+
+    # See https://github.com/red-hat-data-services/rhoai-disconnected-install-helper/tree/main for additional images needed 
