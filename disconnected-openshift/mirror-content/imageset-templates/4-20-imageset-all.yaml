@@ -4,6 +4,7 @@ mirror:
   platform:
     channels:
       - name: stable-4.20
+        minVersion: 4.20.21
         maxVersion: 4.20.21
         shortestPath: true
     graph: true
