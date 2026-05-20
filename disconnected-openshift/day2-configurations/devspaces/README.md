@@ -137,6 +137,17 @@ oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfi
 oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/eclipse/che-plugin-registry:next"}]}}}}}'
 ```
 
+- VS Code expects the plugins to be from a public repo, developers will not be able to install the plugins due to a signature error.  To resolve this in a once-and-done setting apply the following path to the checluster
+```console
+oc patch checluster devspaces -n openshift-devspaces --type='json' -p='[
+  {
+    "op": "add",
+    "path": "/spec/components/cheServer/extraProperties/CHE_WORKSPACE_ENGINE_WORKSPACE_DEFAULT__EDITOR__LAUNCHER__ARGS",
+    "value": "--disable-extensions-signature-verification"
+  }
+]'
+```
+
 ## Configure the number of devspaces instances for a user:
 - By default a devuser can have an unlimited number of workspaces but only 1 workspace running at a time.  The following section will help you configure the number of workpsaces and running workspaces allowed per user.
 
