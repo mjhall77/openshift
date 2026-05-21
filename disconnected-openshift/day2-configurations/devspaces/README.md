@@ -137,9 +137,26 @@ oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfi
 oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/eclipse/che-plugin-registry:next"}]}}}}}'
 ```
 
-- VS Code expects the plugins to be from a public repo, developers will not be able to install the plugins due to a signature error.  To resolve this in a once-and-done setting apply the following path to the checluster
+- VS Code expects the plugins to be from a public repo, developers will not be able to install the plugins due to a signature error.  To resolve this in a once-and-done setting apply the following path to the checluster.  To to this we need to create devspaces-global-settings-disable-plugin-signature.yaml file and then apply it to the cluster
 ```console
-oc patch checluster/devspaces -n devspaces --type='merge' -p '{"spec":{"components":{"cheServer":{"extraProperties":{"CHE_WORKSPACE_ENGINE_WORKSPACE_DEFAULT__EDITOR__LAUNCHER__ARGS": "disable-extensions-signature-verification"}}}}}'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: che-editor-global-settings
+  namespace: openshift-devspaces  # Adjust if your Dev Spaces namespace is different (e.g., eclipse-che)
+  labels:
+    app.kubernetes.io/part-of: che.eclipse.org
+    app.kubernetes.io/component: editor-settings
+data:
+  settings.json: |
+    {
+      "extensions.verifySignature": false
+    }
+```
+
+- Apply the devspaces-global-settings-disable-plugin-signature.yaml to the cluster
+```console
+oc create -f devspaces-global-settings-disable-plugin-signature.yaml
 ```
 
 ## Configure the number of devspaces instances for a user:
