@@ -143,7 +143,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: che-editor-global-settings
-  namespace: openshift-devspaces  # Adjust if your Dev Spaces namespace is different (e.g., eclipse-che)
+  namespace: devspaces  # Adjust if your Dev Spaces namespace is different (e.g., eclipse-che)
   labels:
     app.kubernetes.io/part-of: che.eclipse.org
     app.kubernetes.io/component: editor-settings
