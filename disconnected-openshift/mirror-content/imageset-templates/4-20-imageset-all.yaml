@@ -27,7 +27,6 @@ mirror:
         - name: lws-operator
         - name: rhcl-operator
         - name: kueue-operator
-        - name: nfd
         - name: sriov-network-operator
         - name: authorino-operator
         - name: openshift-cert-manager-operator
@@ -38,6 +37,7 @@ mirror:
         - name: cincinnati-operator
         - name: cluster-observability-operator
         - name: netobserv-operator
+        - name: nfd
 
         # Logging
         - name: cluster-logging
@@ -75,14 +75,10 @@ mirror:
         - name: kubevirt-hyperconverged
         - name: kubernetes-nmstate-operator
         - name: mtv-operator
-        - name: nfd
 
         # Confidential Compute
         - name: sandboxed-containers-operator
         - name: trustee-operator
-
-        # Update Service
-        - name: cincinnati-operator
 
         # Devspaces
         - name: devspaces
