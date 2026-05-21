@@ -1,5 +1,6 @@
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
+archiveSize: 400
 mirror:
   platform:
     channels:
