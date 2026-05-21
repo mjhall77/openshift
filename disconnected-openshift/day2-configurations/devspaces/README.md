@@ -139,13 +139,7 @@ oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"plugi
 
 - VS Code expects the plugins to be from a public repo, developers will not be able to install the plugins due to a signature error.  To resolve this in a once-and-done setting apply the following path to the checluster
 ```console
-oc patch checluster devspaces -n openshift-devspaces --type='json' -p='[
-  {
-    "op": "add",
-    "path": "/spec/components/cheServer/extraProperties/CHE_WORKSPACE_ENGINE_WORKSPACE_DEFAULT__EDITOR__LAUNCHER__ARGS",
-    "value": "--disable-extensions-signature-verification"
-  }
-]'
+oc patch checluster/devspaces -n devspaces --type='merge' -p '{"spec":{"components":{"cheServer":{"extraProperties":{"CHE_WORKSPACE_ENGINE_WORKSPACE_DEFAULT__EDITOR__LAUNCHER__ARGS": "disable-extensions-signature-verification"}}}}}'
 ```
 
 ## Configure the number of devspaces instances for a user:
