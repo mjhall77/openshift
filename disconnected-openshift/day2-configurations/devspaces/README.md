@@ -5,7 +5,7 @@
 
 
 - To provide an internet connected feel for devspaces there are a couple of things that need to be created / pulled from an internet facing system
-  - Build plugin repo
+  - Build plugin repo  Doc: https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.27/html/administration_guide/assembly_managing-ide-extensions_administration_guide#proc_running-open-vsx-using-cli_administration_guide
   - Build sample devfile repo (optional, recommended for inital setup)
   - devspaces and devworkspace-operator
 
