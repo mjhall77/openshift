@@ -9,9 +9,12 @@
   - Build sample devfile repo (optional, recommended for inital setup)
   - devspaces and devworkspace-operator
 
-## Build the plugin repo you will need to have podman, git and yarn installed
+## Build the plugin repo 
+- requirements is to have podman, git and yarn installed and login into registry.redhat.io
 ```console
 sudo dnf install podman yarn git -y
+
+podman login registry.redhat.io
 ```
 
 - Clone repo and update openvsx-sync.json file and build, depending on the number of plugins it could take several minutes to build
@@ -22,17 +25,17 @@ cd che-plugin-registry
 
 vim openvsx-sync.json  #optional if you want to add / remove plugins
 
-./build.sh
+./build.sh -r localhost -t custom
 ```
 
-- Image quay.io/eclipse/che-plugin-registry:next will be created
+- Image localhost/devspaces/pluginregistry-rhel9:custom will be created
 ```console
-podman images
+podman images localhost/devspaces/pluginregistry-rhel9:custom
 ```
 
 - Save index image to tarball for export to disconnected environment
 ```console
-podman save quay.io/eclipse/che-plugin-registry:next > che-plugin-registry-next.tar
+podman save localhost/devspaces/pluginregistry-rhel9:custom > pluginregistry-rhel9.tar
 ```
 
 ## Build sample template devfiles image 
@@ -82,7 +85,7 @@ tar -cvf registry-support-repo.tgz registry-support/*
 ## Checklist to transfer to disconnected network
   - imageset-config.yaml
   - d2m mirror_seq_XXXXX.tar
-  - che-plugin-registry-next.tar
+  - pluginregistry-rhel9.tar
   - registry-support-repo.tgz 
   - devfile-index-latest.tar
 
@@ -101,11 +104,11 @@ podman push <internal-registry-fqdn>:8443/devfile-index:latest
 
 - Push the plugin registry image to local repo
 ```console
-podman load --input devfile-index-latest.tar
+podman load --input pluginregistry-rhel9.tar
 
-podman tag quay.io/eclipse/che-plugin-registry:next <internal-registry-fqdn>:8443/eclipse/che-plugin-registry:next
+podman tag localhost/devspaces/pluginregistry-rhel9:custom <internal-registry-fqdn>:8443/pluginregistry-rhel9:custom
 
-podman push <internal-registry-fqdn>:8443/eclipse/che-plugin-registry:next
+podman push <internal-registry-fqdn>:8443/pluginregistry-rhel9:custom
 ```
 
 - Install Devspaces Operator via Gui Ecosystem -> Software Catalog -> Red Hat OpenShift Dev Spaces -> Install (keep defaults).  You should notice that the DevWorkspace Operator gets installed at the sametime Dev Spaces operator is installed
@@ -134,32 +137,10 @@ oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfi
 
 - Update pluginRegistry repo
 ```console
-oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/eclipse/che-plugin-registry:next"}]}}}}}'
+oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/pluginregistry-rhel9:custom"}]}}}}}'
 ```
 
-- VS Code expects the plugins to be from a public repo, developers will not be able to install the plugins due to a signature error.  To resolve this in a once-and-done setting apply the following path to the checluster.  To to this we need to create devspaces-global-settings-disable-plugin-signature.yaml file and then apply it to the cluster
-```console
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: che-editor-global-settings
-  namespace: devspaces  # Adjust if your Dev Spaces namespace is different (e.g., eclipse-che)
-  labels:
-    app.kubernetes.io/part-of: che.eclipse.org
-    app.kubernetes.io/component: editor-settings
-data:
-  settings.json: |
-    {
-      "extensions.verifySignature": false
-    }
-```
-
-- Apply the devspaces-global-settings-disable-plugin-signature.yaml to the cluster
-```console
-oc create -f devspaces-global-settings-disable-plugin-signature.yaml
-```
-
-## Configure the number of devspaces instances for a user:
+## Configure the number of devspaces instances for a user
 - By default a devuser can have an unlimited number of workspaces but only 1 workspace running at a time.  The following section will help you configure the number of workpsaces and running workspaces allowed per user.
 
 - Get the number of workspaces a user can have.  A -1 indicates unlimited
