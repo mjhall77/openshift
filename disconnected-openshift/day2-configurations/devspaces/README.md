@@ -120,24 +120,24 @@ oc new-project devspaces
 
 - Create CheCluster via GUI, Ecosystem -> Installed Operators -> DevSpaces -> Create instance.   NOTE: Ensure project is set to devspaces namesapce and keep defaults
 
+- Wait for all pods in the devspaces project to be running before continuing
+
 - Deploy the devfile registry
 ```console
 tar -xvf registry-support-repo.tgz
 
 cd registry-support-repo
-bash ./helm-openshift-install.sh --set devfileIndex.image=<interal-registry-fqdn:port>/library/devfile-index --set devfileIndex.tag=latest
+
+helm install devfile-registry ./deploy/chart/devfile-registry --set devfileIndex.image=<registry-fqdn:port>/devspaces/devfile-index --set devfileIndex.tag=latest
 ```
 
 - Once complete update the cheCluster devspaces CR with the route
 ```console
+oc expose svc devfile-regsitry
+
 oc get route 
 
 oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfileRegistry": {"externalDevfileRegistries": [{"url": "http://<devfile-registry route>"}]}}}}'
-```
-
-- Update pluginRegistry repo
-```console
-oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/pluginregistry-rhel9:custom"}]}}}}}'
 ```
 
 ## Configure the number of devspaces instances for a user
