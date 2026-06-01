@@ -6,7 +6,7 @@
 
 - To provide an internet connected feel for devspaces there are a couple of things that need to be created / pulled from an internet facing system
   - Build plugin repo  Doc: https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.27/html/administration_guide/assembly_managing-ide-extensions_administration_guide#proc_running-open-vsx-using-cli_administration_guide
-  - Build sample devfile repo (optional, recommended for inital setup)
+  - Build sample devfile repo (Optional, recommended for inital setup) - You can get the devfile and associated image from https://github.com/devfile/registry.git opposed to building registry
   - devspaces and devworkspace-operator
 
 ## Build the plugin repo 
@@ -38,7 +38,7 @@ podman images localhost/devspaces/pluginregistry-rhel9:custom
 podman save localhost/devspaces/pluginregistry-rhel9:custom > pluginregistry-rhel9.tar
 ```
 
-## Build sample template devfiles image 
+## Build sample devfile registry (optional)
 - Clone repo, update stack directory and build, depending on the number of sample templates in stack directory it could take a couple minutes to build
 NOTE: We will need to add the image from each devfile.yaml to additionalImages in the imageset-config so the workspace can launch.  Recommendation for the platform and developers to sync on workspaces requried. 
 ```console
@@ -63,7 +63,7 @@ git clone https://github.com/devfile/registry-support.git
 tar -cvf registry-support-repo.tgz registry-support/*
 ```
 
-## Need to pull the following content from an internet connected machine
+- Need to pull the following content from an internet connected machine
 - Add the following to the redhat-registry-index section in imageset-config.yaml
 ```yaml
   additionalImages:
@@ -91,25 +91,6 @@ tar -cvf registry-support-repo.tgz registry-support/*
 
 ## Disconnected Openshift Cluster Actions
 - Disk-2-Mirror the images using oc-mirror
-- Deploy the devspaces operator via gui - devworkspace-operator gets installed automatically
-
-- Push the devfile image to local repo 
-```console
-podman load --input devfile-index-latest.tar 
-
-podman tag localhost/devfile-index:latest <internal-registry-fqdn>:8443/devfile-index:latest
-
-podman push <internal-registry-fqdn>:8443/devfile-index:latest
-```
-
-- Push the plugin registry image to local repo
-```console
-podman load --input pluginregistry-rhel9.tar
-
-podman tag localhost/devspaces/pluginregistry-rhel9:custom <internal-registry-fqdn>:8443/pluginregistry-rhel9:custom
-
-podman push <internal-registry-fqdn>:8443/pluginregistry-rhel9:custom
-```
 
 - Install Devspaces Operator via Gui Ecosystem -> Software Catalog -> Red Hat OpenShift Dev Spaces -> Install (keep defaults).  You should notice that the DevWorkspace Operator gets installed at the sametime Dev Spaces operator is installed
 
@@ -122,7 +103,34 @@ oc new-project devspaces
 
 - Wait for all pods in the devspaces project to be running before continuing
 
-- Deploy the devfile registry
+## Deploy Plugin Registry
+- Push the plugin registry image to local repo
+```console
+podman load --input pluginregistry-rhel9.tar
+
+podman tag localhost/devspaces/pluginregistry-rhel9:custom <internal-registry-fqdn>:8443/pluginregistry-rhel9:custom
+
+podman push <internal-registry-fqdn>:8443/pluginregistry-rhel9:custom
+```
+
+- Configure cheCluster with plugin registry image.  It will deploy a new pod and update the pluginregistry URL for you, plugins will be available when you launch devspace
+```console
+oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/devspaces/pluginregistry-rhel9:custom"}]}}}}}'
+```
+
+- NOTE:  The available plugins for installation appear under popular.  Installing plugins causes an extension marketplace lifecycle refresh. Because the environment is disconnected from the public internet, this refresh causes a caching or routing conflict that completely zeroes out the "Popular" section in the UI.  To ge the list of plugins under popluar type @popular in the extenisions marketplace. 
+
+## Deploy the devfile registry (optional)
+- Push the devfile image to local repo 
+```console
+podman load --input devfile-index-latest.tar 
+
+podman tag localhost/devfile-index:latest <internal-registry-fqdn>:8443/devfile-index:latest
+
+podman push <internal-registry-fqdn>:8443/devfile-index:latest
+```
+
+- Extract the registry-support-repo for helm and run the helm chart
 ```console
 tar -xvf registry-support-repo.tgz
 
@@ -131,8 +139,10 @@ cd registry-support-repo
 helm install devfile-registry ./deploy/chart/devfile-registry --set devfileIndex.image=<registry-fqdn:port>/devspaces/devfile-index --set devfileIndex.tag=latest
 ```
 
-- Once complete update the cheCluster devspaces CR with the route
+- Once helm deployment completes update the cheCluster devspaces CR with the route
 ```console
+oc get po   # wait for devfile-regsitry to become ready
+
 oc expose svc devfile-regsitry
 
 oc get route 
