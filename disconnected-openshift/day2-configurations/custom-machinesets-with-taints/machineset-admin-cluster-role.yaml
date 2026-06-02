@@ -20,7 +20,10 @@ rules:
   - patch
   - update
   resourceNames: 
-  - cluster-hz465-9v87n-testbox-us-east-2c
+  - <exact-name-of-machineset>
+  - <exact-name-of-machineset>
+  - <exact-name-of-machineset>
+  - <exact-name-of-machineset>
 - apiGroups:
   - machine.openshift.io
   resources:
