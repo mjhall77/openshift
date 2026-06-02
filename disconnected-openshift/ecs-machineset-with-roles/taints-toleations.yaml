@@ -1,0 +1,6 @@
+# K11
+oc annotate namespace k11 openshift.io/node-selector='dedicated=k11' scheduler.alpha.kubernetes.io/defaultTolerations='[{"key": "dedicated", "operator": "Equal", "value": "k11", "effect": "NoSchedule"}]'
+
+
+# testers
+oc annotate namespace testers openshift.io/node-selector='dedicated=testers' scheduler.alpha.kubernetes.io/defaultTolerations='[{"key": "dedicated", "operator": "Equal", "value": "testers", "effect": "NoSchedule"}]'
