@@ -31,3 +31,17 @@ butane 99-set-nonrotational-mc.bu -o 99-set-nonrotational-mc.yaml
 oc create -f 99-set-nonrotational-mc.yaml
 ```
 
+# Wipe the ODF drives (only if needed)
+- If you re-deploy an OpenShift cluster that had ODF deployed you may need to wipe the previously used disks to install a new ODF cluster
+
+- Determine the drive(s) that you need to wipe
+```console
+oc debug node/<nodename>
+
+chroot /host
+
+lsblk  # identify the disks you want to use for ODF
+
+wipefs -af /dev/<disk>   # disk you want to use for ODF
+```
+
