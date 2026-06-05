@@ -17,7 +17,7 @@ oc create secret generic htpass-secret --from-file=htpasswd=/path/to/htpasswd -n
 - Add indentity provider to the cluster by applying htpasswd-config.yaml 
 
 ```console
-oc apply set-last-applied -f htpasswd-config.yaml --create-annotation
+oc apply -f htpasswd-config.yaml
 ```
 
 - Once the pods in openshift-authentication have been refreshed, users in the htpasswd file would be able to authenticate.  The AGE field should be releatively short
