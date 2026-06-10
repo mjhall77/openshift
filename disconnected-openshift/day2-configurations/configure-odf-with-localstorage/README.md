@@ -43,5 +43,7 @@ chroot /host
 lsblk  # identify the disks you want to use for ODF
 
 wipefs -af /dev/<disk>   # disk you want to use for ODF
+
+sgdisk -Z /dev/<disk>   # disk you want to use for ODF
 ```
 
