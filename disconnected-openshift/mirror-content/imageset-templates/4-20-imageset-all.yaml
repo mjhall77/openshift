@@ -11,7 +11,7 @@ mirror:
     graph: true
   operators:
     # Redhat Operator Index  
-    - catalog: registry.redhat.io/redhat/redhat-operator-index:4.20
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
       packages:
         # RHOAI - You need to declare a min/max or you will pull multiple version
         - name: rhods-operator
