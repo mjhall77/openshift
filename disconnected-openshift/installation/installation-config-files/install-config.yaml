@@ -44,7 +44,7 @@ sshKey: 'ssh-rsa .....'
 # The mappings below can be found in that file and will already have the right registry name and location
 # these are default examples for a command like
 # oc-mirror --from <archive_dir> bastion.localdomain:5000
-imageContentSources:
+imageDigestSources:
 - mirrors:
   - bastion.localdomain:5000/openshift/release  # Change this line to point to your private registry
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
