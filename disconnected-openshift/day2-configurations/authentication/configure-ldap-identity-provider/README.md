@@ -56,7 +56,7 @@ oc logs -l app=oauth-openshift -n openshift-authentication
 
 - Samples of these are located the repo
 
-- Update the ldap-sync-service-account.yaml then apply it
+- Apply the ldap-sync-service-account.yaml, it will create the service account, cluster role and cluster role binding required for the cronjob
 
 ```console
 oc new-project ldap-sync
@@ -64,21 +64,11 @@ oc new-project ldap-sync
 oc apply -f ldap-sync-service-account.yaml
 ```
 
-- Create the Ldap Group Sync role
-
-```console
-oc apply -f ldap-sync-cluster-role.yaml
-```
-
-- Create the Cluster Role Binding **Note if you change the serivce account name you will need to update the ldap-sync-cluster-role-binding.yaml config**
-
-```console
-oc apply -f ldap-sync-cluster-role-binding.yaml
-```
-
 - Create the config map for either secure or unsecure connection. To sync specific groups you will need to update the groupUIDNameMapping section of the cm
 
 ```console
+oc create configmap ldap-ca --from-file=ca-bundle.crt=/path/to/your/ca-bundle.crt -n ldap-sync
+
 oc apply -f cm-secure-ldap-groupsync.yaml
 ```
 
