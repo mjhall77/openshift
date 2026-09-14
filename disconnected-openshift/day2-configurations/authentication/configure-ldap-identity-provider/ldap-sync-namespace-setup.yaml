@@ -1,0 +1,38 @@
+---
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: ldap-sync
+displayName: "ldap-sync"
+description: "Project for Outh LDAP sync cronjob"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ldap-group-syncer
+  namespace: ldap-sync
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ldap-group-syncer
+rules:
+- apiGroups: ["user.openshift.io"]
+  resources: ["groups"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+- apiGroups: ["user.openshift.io"]
+  resources: ["users", "identities", "useridentitymappings"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ldap-group-syncer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ldap-group-syncer
+subjects:
+- kind: ServiceAccount
+  name: ldap-group-syncer
+  namespace: ldap-sync

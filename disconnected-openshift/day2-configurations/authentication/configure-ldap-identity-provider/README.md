@@ -52,37 +52,32 @@ oc logs -l app=oauth-openshift -n openshift-authentication
 
 - Once users can successfully authenticate via LDAP, next step is to configure LDAP group sync. It synchronizes user groups from an external LDAP directory into OpenShift, allowing administrators to manage permissions and access for groups defined in a central location
 
-- You will need to create the following CRs: Namespace, Service Account, Cluster Role, Cluster Role Binding, Sync Config Map, Whitelist Config Map of Groups, CronJob
-
-- Samples of these are located the repo
-
-- Apply the ldap-sync-service-account.yaml, it will create the service account, cluster role and cluster role binding required for the cronjob
-
-```console
-oc new-project ldap-sync
-
-oc apply -f ldap-sync-service-account.yaml
+- 1. Create namespace, service account, role and role-binding for the conjob
+``` console
+oc apply -f ldap-sync-namespace-setup.yaml
 ```
 
-- Create the config map for either secure or unsecure connection. To sync specific groups you will need to update the groupUIDNameMapping section of the cm
+- 3. Create the Secret (Bind Password) **Important:** Use single quotes around the password to prevent shell interpretation of special characters (`$`, `!`, `#`).
+```console
+oc create secret generic ldap-secret --from-literal=bindPassword='YourP@ssword!' -n ldap-sync
+```
 
+- 4. Create the CA Bundle ConfigMap (If Using LDAPS)
 ```console
 oc create configmap ldap-ca --from-file=ca-bundle.crt=/path/to/your/ca-bundle.crt -n ldap-sync
-
-oc apply -f cm-secure-ldap-groupsync.yaml
 ```
 
-- Create a group-list cm for mapping groups
-
+- 5. Update ldap-sync-groupsync-cm.yaml with site specific ldap and group information.  If you are not using ldaps change to port 389 and remove ca.  Apply configuration following updates
 ```console
-oc apply -f ldap-sync-grouplist.yaml
+oc apply -f ldap-sync-groupsync-cm.yaml
 ```
 
-- Create the cronjob that will sync LDAP groups with Openshift Groups
-
+- 6. Apply the ldap sync cronjob config
 ```console
-oc apply -f ldap-sync-cron-job.yaml
+oc apply -f ldap-sync-cronjob.yaml
 ```
+
+
 
 - Once groups are populated with users you will need to configure permissions 
   - **grant role to group at a namspace level:**  oc policy add-role-to-group cluster-role groupname -n namespace
